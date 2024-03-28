@@ -1,49 +1,31 @@
-import requests
 from bs4 import BeautifulSoup
-import json
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+chrome_options = Options()
+#chrome_options.add_argument("--disable-extensions")
+#chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--no-sandbox") # linux only
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--start-maximized")
 
-class Api:
-    """
-    A class used to store constants
-    """
-    def __init__(self, title_info=None, link_info=None, date_info=None, news_info=None):
-        """
-        Initializes the constants
-        """
-        self.html_parser = "html.parser"
-        self.url = [
-            "https://www.moneycontrol.com/mutual-funds/quant-small-cap-fund-direct-plan/portfolio-overview/MES056"
-        ]
-        # self.AllData = ["https://www.niftyindices.com/market-data/equity-stock-watch?Iname=NIFTY%20TOTAL%20MKT"]
+driver = webdriver.Chrome(options=chrome_options)
+dataTags = []
 
+urls = ["https://www.moneycontrol.com/markets/indian-indices/","https://www.moneycontrol.com/markets/indian-indices/top-nseit-companies-list/19?classic=true&categoryId=2&ex=N"]
 
-# dummy = {}
+for i in urls:
 
-soup = BeautifulSoup(requests.get(Api().url[0], timeout=60).text, Api().html_parser)
-# soup_allData = BeautifulSoup(requests.get(Api().AllData[0], timeout=60).text, Api().html_parser)
+    driver.get(i)
+    soup = BeautifulSoup(driver.page_source,'lxml')
 
-soup_body = soup.select("table#equityCompleteHoldingTable > tbody > tr > td")
-soup_header = soup.select("table#equityCompleteHoldingTable > thead > tr > th")
+    soup_body = soup.select("#indicesTableData tr td")
+    dataTags = soup_body + dataTags
+# print(html)
+print(dataTags)
 
-print(soup_allData)
+# Get the page source after interactions
+# element = driver.find_element(By.ID, "indicesTableData")
+# print(element)
+# Parse the page source with Beautiful Soup
 
-
-setData = []
-
-
-# print(soup_body)
-count=0
-
-for x in soup_body:
-    if count <= len(soup_body)-1:
-        dummy = {}
-        for y in soup_header:
-            dummy[y.get_text()] = soup_body[count].get_text()
-            count = count + 1
-        setData.append(dummy)
-
-print(setData)
-
-with open('data.json', 'w') as my_file:
-    json.dump(setData, my_file,indent = 4)
-
+driver.quit()
