@@ -1,1 +1,3 @@
 /client/stockmarkettracker/node_modules/*
+/client/stockmarkettracker/public/*
+/client/stockmarkettracker/package-lock.json
