@@ -24,47 +24,26 @@ function App() {
         )
           .then((response) => response.json())
           .then((result) => {
-            var stocksNames = [];
-            var stocksSelected = [];
-            // result.data.forEach((eachStock) => {
-            //   stocksNames.push(eachStock["Stock Invested in"]);
-            // });
-            let bseFilteredData;
-            let nseFilteredData;
+            var filteredData = [];
 
             result.data.forEach((eachStock)=>{
-              
-            bseFilteredData = AllStocksData.data["bseData"].filter(
-              (stock) => {
-              
-                if (eachStock) {
-                  stocksSelected.push(stock["Name"]);
-                  return stock;
-                }
+              if(AllStocksData.data["bseData"][eachStock['Stock Invested in']]){
+                var temp = AllStocksData.data["bseData"][eachStock['Stock Invested in']];
+                temp['totalHolding'] =  eachStock['% of Total Holdings']
+                filteredData.push(temp);
               }
-            );
-
-            nseFilteredData = AllStocksData.data["nseData"].filter(
-              (stock) => {
-                if (
-                  stocksNames.includes(stock["Name"]) &&
-                  !stocksSelected.includes(stock["Name"])
-                ) {
-                  // stocksSelected.push(stock["Name"])
-                  return stock;
-                }
+              else if(AllStocksData.data["nseData"][eachStock['Stock Invested in']]){
+                var temp = AllStocksData.data["nseData"][eachStock['Stock Invested in']];
+                temp['totalHolding'] =  eachStock['% of Total Holdings']
+                filteredData.push(temp);
               }
-            );
           })
 
 
-            var filteredData = bseFilteredData.concat(nseFilteredData);
 
             let totalChg = filteredData.reduce((acc, currentVal) => {
               return (
-                acc +
-                parseFloat(currentVal["%Chg"]) *
-                  parseFloat(currentVal["% of Total Holdings"])
+                acc +parseFloat(currentVal["totalHolding"])
               );
             }, 0);
 
