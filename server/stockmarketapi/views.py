@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import json
 import datetime
 import time
-from . import Apis
+from .Scripts import Apis
 
 # import FetchAllData
         
@@ -14,51 +14,20 @@ fetchAllData = Apis.Api()
 
 @api_view(['GET'])
 def allStocksData(request):
-    
-    startTime = time.time()
-    
-    nseData = fetchAllData.fetchNseAllData()
-    bseData = fetchAllData.fetchBseAllData()
-    
-    endTime = time.time()
-
-    # get the execution time
-    elapsed_time = int(endTime - startTime)
-    elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
-    print('Execution time:', elapsed_time)
-    
-    
-    responseData = {
-        "result":"success",
-        "data":{
-          "bseData":bseData,
-          "nseData":nseData
-        },
-        "stocksCount":{
-            "bseStocksCount":len(bseData),
-            "nseStockCount":len(nseData)
-        },
-        "lastUpdated":str(datetime.datetime.now()),
-        "executedTime":elapsed_time
-    }
-
+    responseData = fetchAllData.allStocksData()
     return Response(responseData)
+
 
 @api_view(['GET'])
 def getMutualFundData(request):
-    
     startTime = time.time()
-    
-    mfData = fetchAllData.MutualFundsTracker("https://www.moneycontrol.com/mutual-funds/quant-small-cap-fund-direct-plan/portfolio-holdings/MES056")
-    
+    mfData = fetchAllData.MutualFundsTracker("https://www.moneycontrol.com/mutual-funds/tata-digital-india-fund-direct-plan/portfolio-overview/MTA1147")
     endTime = time.time()
 
     # get the execution time
     elapsed_time = int(endTime - startTime)
     elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
     print('Execution time:', elapsed_time)
-
-    
 
     return Response({
         'response':"true",
