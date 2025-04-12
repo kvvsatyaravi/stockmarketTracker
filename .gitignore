@@ -6,3 +6,6 @@
 /server/stockmarketapi/__pycache__/*
 /server/server/__pycache__/*
 /server/stockmarketapi/migrations/*
+/server/stockmarketapi/Scripts/__pycache__/*
+
+/.idea/*

@@ -21,7 +21,7 @@ def allStocksData(request):
 @api_view(['GET'])
 def getMutualFundData(request):
     startTime = time.time()
-    mfData = fetchAllData.MutualFundsTracker("https://www.moneycontrol.com/mutual-funds/tata-digital-india-fund-direct-plan/portfolio-overview/MTA1147")
+    mfData = fetchAllData.MutualFundsTracker("https://www.moneycontrol.com/mutual-funds/quant-small-cap-fund-direct-plan-growth/portfolio-overview/MES056")
     endTime = time.time()
 
     # get the execution time
@@ -35,3 +35,12 @@ def getMutualFundData(request):
         "executedTime":elapsed_time
         })
 
+@api_view(['GET'])
+def getMutualFundSuggestions(request):
+    mutualFundUrlOptions = "https://www.moneycontrol.com/mccode/common/autosuggestion_solr.php?classic=true&type=2&format=json&main=true&callback=suggest1&query="
+    print(request.query_params)
+    muutualFundsSuggestions = requests.get(mutualFundUrlOptions+request.query_params['fund'],headers={'Accept': 'application/json'})
+    return Response({
+        'response':"true",
+        'data':muutualFundsSuggestions
+        })

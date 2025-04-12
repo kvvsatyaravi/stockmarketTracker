@@ -56,6 +56,29 @@ class Api:
         }
         
         return responseData
+    
+
+    def mutualFundsPerformanceData(self):
+        url = "https://www.moneycontrol.com/mutual-funds/nav/kotak-focused-equity-fund-direct-plan/returns/MKM1343"
+        html_parser = "html.parser"
+
+        soup = BeautifulSoup(requests.get(url, timeout=60).text, html_parser)
+        soup_header = soup.select("div.returns_table > table.mctable1 > thead > tr > th")
+        soup_body = soup.select("div.returns_table table.mctable1 tbody tr")
+        soup_data = soup.select("div.returns_table table.mctable1 tbody td")
+
+        count=0
+        setData = {}
+        for x in soup_body:
+            dummy = {}
+            for y in soup_header:
+                dummy[y.get_text().strip()] = soup_data[count].get_text().replace('/n','').strip()
+                count = count + 1
+
+            setData[soup_data[count - 7].get_text().replace('/n','').strip()] = dummy
+        print(setData)
+        with open('data.json', 'w') as my_file:
+            json.dump(setData, my_file,indent = 4)
 
         
 
