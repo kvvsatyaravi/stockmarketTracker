@@ -44,3 +44,12 @@ def getMutualFundSuggestions(request):
         'response':"true",
         'data':muutualFundsSuggestions
         })
+
+@api_view(["Get"])
+def getFundPerformanceData(request):
+    fundUrl = "https://www.moneycontrol.com/mutual-funds/nav/kotak-focused-equity-fund-direct-plan/returns/MKM1343"
+    returnData = fetchAllData.mutualFundsPerformanceData(fundUrl)
+    return Response({
+        'response':"true",
+        'data':returnData
+        })

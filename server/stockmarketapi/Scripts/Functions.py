@@ -26,13 +26,15 @@ def scrapingWebsite(response):
             dummy = {}
             for y in soup_header:
                 if soup_body[count].a:
-                    link = soup_body[count].a['href']
-                    name = link.replace("https://www.moneycontrol.com/india/stockpricequote/","")
-                    name = name.split("/")
-                    # print(name[1])
-                    if name[1]:
-                        dummy[y.get_text().strip()] = name[1]
-                        count = count + 1
+                    # link = soup_body[count].a['href']
+                    # name = link.replace("https://www.moneycontrol.com/india/stockpricequote/","")
+                    # name = name.split("/")
+                    # # print(name[1])
+                    # if name[1]:
+                    #     dummy[y.get_text().strip()] = name[1]
+                    #     count = count + 1
+                    dummy[y.get_text().strip()] = soup_body[count].get_text().replace('/n','').replace(' Ltd.','').strip()
+                    count = count + 1
                 else:
                     dummy[y.get_text().strip()] = soup_body[count].get_text().replace('/n','').strip()
                     count = count + 1

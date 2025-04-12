@@ -58,8 +58,7 @@ class Api:
         return responseData
     
 
-    def mutualFundsPerformanceData(self):
-        url = "https://www.moneycontrol.com/mutual-funds/nav/kotak-focused-equity-fund-direct-plan/returns/MKM1343"
+    def mutualFundsPerformanceData(self,url):
         html_parser = "html.parser"
 
         soup = BeautifulSoup(requests.get(url, timeout=60).text, html_parser)
@@ -77,11 +76,10 @@ class Api:
 
             setData[soup_data[count - 7].get_text().replace('/n','').strip()] = dummy
         print(setData)
-        with open('data.json', 'w') as my_file:
-            json.dump(setData, my_file,indent = 4)
+        # with open('data.json', 'w') as my_file:
+        #     json.dump(setData, my_file,indent = 4)
 
-        
-
+        return setData
 
     def MutualFundsTracker(self,url):
         mutualFund = "quantsmallcap"
@@ -108,16 +106,17 @@ class Api:
             dummy = {}
             for y in soup_header:
                 if y.get_text().strip() == 'Stock Invested in':
-                    link = titles[titlesCount]['href']
-                    name = link.replace("https://www.moneycontrol.com/india/stockpricequote/","")
-                    name = name.split("/")
+                    # link = titles[titlesCount]['href']
+                    # name = link.replace("https://www.moneycontrol.com/india/stockpricequote/","")
+                    # name = name.split("/")
                     # print(name)
                     
-                    dummy[y.get_text().strip()] = name[1]
-                    titlesCount = titlesCount +1
+                    # dummy[y.get_text().strip()] = name[1]
+                    # titlesCount = titlesCount +1
+                    dummy[y.get_text().strip()] = soup_data[count].get_text().replace('/n',' ').replace(' Ltd.','').strip()
                     count = count + 1
                 else:
-                    dummy[y.get_text().strip()] = soup_data[count].get_text().replace('/n','').strip()
+                    dummy[y.get_text().strip()] = soup_data[count].get_text().replace('/n',' ').strip()
                     count = count + 1
 
             setData.append(dummy)

@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
     path('getMutualFundData/', views.getMutualFundData, name='getMutualFundData'),
-    path('allStocksData/',views.allStocksData,name='allStocksData')
+    path('allStocksData/',views.allStocksData,name='allStocksData'),
+    path('mutualFundReturnData/',views.getFundPerformanceData,name='mutualFundReturnData')
 ]
