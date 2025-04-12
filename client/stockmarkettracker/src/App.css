@@ -1,32 +1,32 @@
 body {
-    background-color: #f5f5f5;
-  }
-  .sidebar {
-    background-color: #0b1a47;
-    color: white;
-    height: 100vh;
-    padding-top: 20px;
-  }
-  .sidebar .nav-link {
-    color: white;
-  }
-  .sidebar .nav-link.active {
-    background-color: #2c3e75;
-    border-radius: 8px;
-  }
-  .main-content {
-    padding: 30px;
-    height: 100vh;
-  }
-  .priority-medium {
-    color: gold;
-  }
-  .priority-high {
-    color: red;
-  }
-  .change-positive {
-    color: green;
-  }
-  .change-negative {
-    color: red;
-  }
+  background-color: #f5f5f5;
+}
+.sidebar {
+  background-color: #0b1a47;
+  color: white;
+  height: 100vh;
+  padding-top: 20px;
+}
+.sidebar .nav-link {
+  color: white;
+}
+.sidebar .nav-link.active {
+  background-color: #2c3e75;
+  border-radius: 8px;
+}
+.main-content {
+  padding: 30px;
+  height: 100vh;
+}
+.priority-medium {
+  color: gold;
+}
+.priority-high {
+  color: red;
+}
+.change-positive {
+  color: green;
+}
+.change-negative {
+  color: red;
+}
