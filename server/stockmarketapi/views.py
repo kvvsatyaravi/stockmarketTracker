@@ -53,3 +53,12 @@ def getFundPerformanceData(request):
         'response':"true",
         'data':returnData
         })
+
+@api_view(["Get"])
+def getSearchSuggerstions(request):
+    searchUrl = "https://www.moneycontrol.com/mccode/common/autosuggestion_solr.php?classic=true&query=small%20cap&type=1&format=json&main=true"
+    Data = fetchAllData.getSearchSuggestions(searchUrl)
+    return Response({
+        'response':"true",
+        'data':Data
+        })

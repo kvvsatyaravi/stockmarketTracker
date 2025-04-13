@@ -122,3 +122,9 @@ class Api:
             setData.append(dummy)
 
         return setData
+    
+    def getSearchSuggestions(self,url):
+        payload = {}
+        headers = {}
+        response = requests.request("GET", url, headers=headers, data=payload)
+        return json.loads(response.text)
