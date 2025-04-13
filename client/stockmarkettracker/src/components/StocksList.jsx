@@ -25,7 +25,7 @@ function StocksList() {
 
   function FetchAllStocksData() {
     return fetch(
-      "https://www.ksrk3.in/stockmarketTrackerApi/api/allStocksData/",
+      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/allStocksData/",
       requestOptions
     )
       .then((res) => res.json())

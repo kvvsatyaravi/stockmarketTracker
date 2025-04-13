@@ -1,6 +1,16 @@
 body {
   background-color: #f5f5f5;
 }
+
+.primary-color{
+  background-color: #0b1a47 !important;
+}
+
+.secondary-color{
+  background-color: #ff914c !important;
+  border: #ff914c !important;
+}
+
 .sidebar {
   background-color: #0b1a47;
   color: white;

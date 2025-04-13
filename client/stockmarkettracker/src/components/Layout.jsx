@@ -13,7 +13,7 @@ function Layout() {
         <div class="row">
           <SidePanel />
           <div class="col-md-10 main-content">
-            <h3 class="mb-4 text-secondary justify-content-center">
+            <h3 class="mb-4 d-flex text-secondary justify-content-center">
               StockMarket Tracker
             </h3>
             <Routes>
