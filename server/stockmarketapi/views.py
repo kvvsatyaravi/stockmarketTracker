@@ -2,11 +2,10 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import requests
-from bs4 import BeautifulSoup
-import json
 import datetime
 import time
 from .Scripts import Apis
+from Scripts.Functions import fetchExchangeData
 
 # import FetchAllData
         
@@ -21,7 +20,7 @@ def allStocksData(request):
 @api_view(['GET'])
 def getMutualFundData(request):
     startTime = time.time()
-    mfData = fetchAllData.MutualFundsTracker("https://www.moneycontrol.com/mutual-funds/quant-small-cap-fund-direct-plan-growth/portfolio-overview/MES056")
+    mfData = fetchAllData.MutualFundsTracker("https://www.moneycontrol.com/mutual-funds/"+request.query_params['fundName']+"/portfolio-overview/"+request.query_params['fundid'])
     endTime = time.time()
 
     # get the execution time
@@ -47,7 +46,7 @@ def getMutualFundSuggestions(request):
 
 @api_view(["Get"])
 def getFundPerformanceData(request):
-    fundUrl = "https://www.moneycontrol.com/mutual-funds/nav/kotak-focused-equity-fund-direct-plan/returns/MKM1343"
+    fundUrl = "https://www.moneycontrol.com/mutual-funds/nav/"+request.query_params['fundName']+"/returns/"+request.query_params['fundid']
     returnData = fetchAllData.mutualFundsPerformanceData(fundUrl)
     return Response({
         'response':"true",
@@ -56,9 +55,56 @@ def getFundPerformanceData(request):
 
 @api_view(["Get"])
 def getSearchSuggerstions(request):
-    searchUrl = "https://www.moneycontrol.com/mccode/common/autosuggestion_solr.php?classic=true&query=small%20cap&type=1&format=json&main=true"
+    searchUrl = "https://www.moneycontrol.com/mccode/common/autosuggestion_solr.php?classic=true&query="+request.query_params['fundName']+"&type=2&format=json&main=true"
     Data = fetchAllData.getSearchSuggestions(searchUrl)
     return Response({
         'response':"true",
         'data':Data
         })
+
+@api_view(["Get"])
+def bseStocksData():
+    startTime = time.time()
+    bseIndexsUrls = ["https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=B&indicesID=67&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true"]
+    data = fetchExchangeData(bseIndexsUrls)
+    endTime = time.time()
+    # get the execution time
+    elapsed_time = int(endTime - startTime)
+    elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
+    responseData = {
+        "bse":{
+            "result":"success",
+            "data":data,
+            "stocksCount":len(data),
+            "lastUpdated":str(datetime.datetime.now()),
+            "executedTime":elapsed_time
+        }
+    }
+    return Response(responseData)
+
+@api_view(["get"])
+def nseStocksData():
+    startTime = time.time()
+    nseIndexsUrls = [
+        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=136&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",
+        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=111&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",
+        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=114&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",
+        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=7&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",
+        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=135&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true"]
+    
+    data = fetchExchangeData(nseIndexsUrls)
+    endTime = time.time()
+    # get the execution time
+    elapsed_time = int(endTime - startTime)
+    elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
+    responseData = {
+        "nse":{
+            "result":"success",
+            "data":data,
+            "stocksCount":len(data),
+            "lastUpdated":str(datetime.datetime.now()),
+            "executedTime":elapsed_time
+        }
+    }
+    return Response(responseData)
+

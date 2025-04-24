@@ -1,4 +1,17 @@
 from bs4 import BeautifulSoup
+import requests
+
+
+def fetchExchangeData(urlsArr):
+    payload = {}
+    headers = {}
+    setData = {}
+    for i in urlsArr:
+        response = requests.request("GET", i, headers=headers, data=payload)
+        data = scrapingWebsite(response)
+        setData.update(data)
+
+    return setData
 
 def scrapingWebsite(response):
 
