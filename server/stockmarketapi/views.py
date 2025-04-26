@@ -5,7 +5,7 @@ import requests
 import datetime
 import time
 from .Scripts import Apis
-from Scripts.Functions import fetchExchangeData
+from .Scripts.Functions import fetchExchangeData
 
 # import FetchAllData
         
@@ -63,7 +63,7 @@ def getSearchSuggerstions(request):
         })
 
 @api_view(["Get"])
-def bseStocksData():
+def bseStocksData(request):
     startTime = time.time()
     bseIndexsUrls = ["https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=B&indicesID=67&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true"]
     data = fetchExchangeData(bseIndexsUrls)
@@ -83,7 +83,7 @@ def bseStocksData():
     return Response(responseData)
 
 @api_view(["get"])
-def nseStocksData():
+def nseStocksData(request):
     startTime = time.time()
     nseIndexsUrls = [
         "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=136&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Select } from "antd";
-import useGetApiData from "./useGetApiData";
+import { useGetApiData } from "./commonUtils";
 
 const MutualFunds = () => {
   const [fundOptions, setFundOptions] = useState([]);
@@ -54,11 +54,19 @@ const MutualFunds = () => {
     selectedFunds.forEach((e) => {
       console.log(e);
       if (e.includes("www.moneycontrol.com")) {
-        var fundStr = e.replace("https://www.moneycontrol.com/mutual-funds/nav/", "");
+        var fundStr = e.replace(
+          "https://www.moneycontrol.com/mutual-funds/nav/",
+          ""
+        );
         fundStr = fundStr.split("/");
         var Name = fundStr[0];
         var id = fundStr[1];
-        fundsUrls.push("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/mutualFundReturnData/?fundName=" + Name + "&fundid=" + id);
+        fundsUrls.push(
+          "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/mutualFundReturnData/?fundName=" +
+            Name +
+            "&fundid=" +
+            id
+        );
         fundsOrder.push(e);
       }
     });
@@ -79,7 +87,9 @@ const MutualFunds = () => {
 
   const { response, loading, error } = useGetApiData({
     method: "get",
-    url: "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/searchSuggestion?fundName=" + searchValue,
+    url:
+      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/searchSuggestion?fundName=" +
+      searchValue,
   });
 
   useEffect(() => {
@@ -103,8 +113,18 @@ const MutualFunds = () => {
         if (eachPeriod.field != "") {
           fundsApiData.forEach((eachFundData) => {
             var val;
-            if (eachPeriod.label.includes("Year")) val = ["-", undefined].includes(eachFundData.data[eachPeriod.label]?.["Annualised Returns"]) ? 0 : eachFundData.data[eachPeriod.label]["Annualised Returns"];
-            else val = ["-", undefined].includes(eachFundData.data[eachPeriod.label]?.["Absolute Returns"]) ? 0 : eachFundData.data[eachPeriod.label]["Absolute Returns"];
+            if (eachPeriod.label.includes("Year"))
+              val = ["-", undefined].includes(
+                eachFundData.data[eachPeriod.label]?.["Annualised Returns"]
+              )
+                ? 0
+                : eachFundData.data[eachPeriod.label]["Annualised Returns"];
+            else
+              val = ["-", undefined].includes(
+                eachFundData.data[eachPeriod.label]?.["Absolute Returns"]
+              )
+                ? 0
+                : eachFundData.data[eachPeriod.label]["Absolute Returns"];
 
             avgVal = parseFloat(val) + avgVal;
           });
@@ -123,7 +143,10 @@ const MutualFunds = () => {
     <div className="container">
       <div className="row d-flex justify-content-center">
         <Select
+        className="col-8"
           mode="tags"
+          maxTagTextLength="10"
+          maxCount="5"
           placeholder="Please select"
           onSelect={(evt) => {
             setSelectedFunds(selectedFunds.concat(evt));
@@ -140,7 +163,11 @@ const MutualFunds = () => {
           style={{ width: "45%" }}
           options={fundOptions}
         />
-        <button type="button" className="secondary-color col-2 btn btn-primary" onClick={() => fundsPerformanceData()}>
+        <button
+          type="button"
+          className="secondary-color col-1 btn btn-primary"
+          onClick={() => fundsPerformanceData()}
+        >
           Analyze
         </button>
       </div>
@@ -167,12 +194,25 @@ const MutualFunds = () => {
                       const selFunds = selectedFunds;
                       if (selFunds[index]) {
                         if (eachPeriod.label == "Name") {
-                          var fundStr = selFunds[index].replace("https://www.moneycontrol.com/mutual-funds/nav/", "");
+                          var fundStr = selFunds[index].replace(
+                            "https://www.moneycontrol.com/mutual-funds/nav/",
+                            ""
+                          );
                           fundStr = fundStr.split("/");
                           var Name = fundStr[0];
                           return <td>{Name.replaceAll("-", " ")}</td>;
                         } else {
-                          return <td>{eachPeriod.field.includes("Year") ? eachFund.data[eachPeriod.field]?.["Annualised Returns"] : eachFund.data[eachPeriod.field]?.["Absolute Returns"]}</td>;
+                          return (
+                            <td>
+                              {eachPeriod.field.includes("Year")
+                                ? eachFund.data[eachPeriod.field]?.[
+                                    "Annualised Returns"
+                                  ]
+                                : eachFund.data[eachPeriod.field]?.[
+                                    "Absolute Returns"
+                                  ]}
+                            </td>
+                          );
                         }
                       }
                     })}
@@ -189,13 +229,17 @@ const MutualFunds = () => {
               <tr>
                 {TableDefinition.map((eachPeriod) => (
                   <>
-                    <th>{eachPeriod.label == "Name" ? "" : eachPeriod.label}</th>
+                    <th>
+                      {eachPeriod.label == "Name" ? "" : eachPeriod.label}
+                    </th>
                   </>
                 ))}
               </tr>
             </thead>
             <tbody>
-              <tr>{avgApiData && avgApiData.map((val, index) => <td>{val}</td>)}</tr>
+              <tr>
+                {avgApiData && avgApiData.map((val, index) => <td>{val}</td>)}
+              </tr>
             </tbody>
           </table>
         </div>

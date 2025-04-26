@@ -5,10 +5,31 @@ import Topics from "./Topics";
 import Checklists from "./CheckLists";
 import { Routes, Route, Navigate } from "react-router";
 import SidePanel from "./SidePanel";
+import { StockmarketContext } from "./commonUtils";
 
 function Layout() {
+  const [exchangeData,setExchangeData] = useState({});
+
+  function FetchAllStocksData() {
+    var exchangesDataResponses = [];
+    ["https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getNSEData/","https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getBSEData/"].forEach(e =>{
+      var response = fetch(e).then(e => e.json())
+      exchangesDataResponses.push(response)
+    })
+    Promise.all(exchangesDataResponses).then((AllStocksData) => {
+      var filteredData = [];
+        console.log(AllStocksData);
+        
+    }) .catch((error) => console.error(error));
+  }
+
+  useEffect(() => {
+    FetchAllStocksData();
+  }, []);
+
   return (
     <>
+    <StockmarketContext value={[exchangeData,setExchangeData]}>
       <div class="container-fluid">
         <div class="row">
           <SidePanel />
@@ -26,6 +47,7 @@ function Layout() {
           </div>
         </div>
       </div>
+      </StockmarketContext>
     </>
   );
 }

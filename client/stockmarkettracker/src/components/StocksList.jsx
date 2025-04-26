@@ -23,28 +23,7 @@ function StocksList() {
     redirect: "follow",
   };
 
-  function FetchAllStocksData() {
-    return fetch(
-      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/allStocksData/",
-      requestOptions
-    )
-      .then((res) => res.json())
-      .then((AllStocksData) => {
-        var filteredData = [];
-        console.log(AllStocksData);
-        Object.keys(AllStocksData.data["bseData"]).forEach((eachStock) => {
-          filteredData.push(AllStocksData.data["bseData"][eachStock]);
-        });
-
-        console.log(filteredData);
-        setStocksData(filteredData);
-      })
-      .catch((error) => console.error(error));
-  }
-
-  useEffect(() => {
-    FetchAllStocksData();
-  }, []);
+ 
 
   return (
     <>
