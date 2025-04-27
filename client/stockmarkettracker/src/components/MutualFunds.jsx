@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Select } from "antd";
-import { useGetApiData } from "./commonUtils";
+import { useGetApiData, Loader } from "./commonUtils";
 
 const MutualFunds = () => {
   const [fundOptions, setFundOptions] = useState([]);
@@ -8,6 +8,7 @@ const MutualFunds = () => {
   const [selectedFunds, setSelectedFunds] = useState([]);
   const [fundsApiData, setFundsApiData] = useState([]);
   const [avgApiData, setAvgApiData] = useState([]);
+  const [loader, setLoader] = useState(false);
 
   const TableDefinition = [
     {
@@ -45,9 +46,13 @@ const MutualFunds = () => {
   ];
 
   const fundsPerformanceData = () => {
-    const fundsUrls = [];
-    const fundsApiResponse = [];
-    const fundsData = [];
+    setLoader(true);
+    const fundsReturnsUrls = [];
+    const fundsPortfolioUrls = [];
+    const fundsReturnsApiResponse = [];
+    const fundsPortfolioApiResponse = [];
+    const fundsReturnsData = [];
+    const fundsPortfoolioData = [];
     var fundsOrder = [];
     // setFundOptions([]);
 
@@ -61,8 +66,14 @@ const MutualFunds = () => {
         fundStr = fundStr.split("/");
         var Name = fundStr[0];
         var id = fundStr[1];
-        fundsUrls.push(
+        fundsReturnsUrls.push(
           "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/mutualFundReturnData/?fundName=" +
+            Name +
+            "&fundid=" +
+            id
+        );
+        fundsPortfolioUrls.push(
+          "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getMutualFundData/?fundName=" +
             Name +
             "&fundid=" +
             id
@@ -70,18 +81,30 @@ const MutualFunds = () => {
         fundsOrder.push(e);
       }
     });
-    console.log(fundsUrls);
+    // console.log(fundsReturnsUrls);
 
-    fundsUrls.forEach((eachFund) => {
-      fundsApiResponse.push(fetch(eachFund).then((e) => e.json()));
+    fundsReturnsUrls.forEach((eachFund) => {
+      fundsReturnsApiResponse.push(fetch(eachFund).then((e) => e.json()));
     });
 
-    Promise.all(fundsApiResponse).then((responses) => {
+    fundsPortfolioUrls.forEach((eachFund) => {
+      fundsPortfolioApiResponse.push(fetch(eachFund).then((e) => e.json()));
+    });
+
+    Promise.all(fundsReturnsApiResponse).then((responses) => {
       responses.forEach((each, index) => {
-        fundsData.push({ ...each, url: fundsOrder[index] });
+        fundsReturnsData.push({ ...each, url: fundsOrder[index] });
       });
-      console.log(fundsData);
-      setFundsApiData(fundsData);
+      console.log(fundsReturnsData);
+      setFundsApiData(fundsReturnsData);
+    });
+
+    Promise.all(fundsPortfolioApiResponse).then((responses) => {
+      responses.forEach((each, index) => {
+        fundsPortfoolioData.push({ ...each, url: fundsOrder[index] });
+      });
+      console.log(fundsPortfoolioData);
+      setLoader(false);
     });
   };
 
@@ -104,6 +127,7 @@ const MutualFunds = () => {
       setFundOptions(searchResponseData);
     }
   }, [response]);
+
 
   useEffect(() => {
     if (fundsApiData.length > 0) {
@@ -143,7 +167,7 @@ const MutualFunds = () => {
     <div className="container">
       <div className="row d-flex justify-content-center">
         <Select
-        className="col-8"
+          className="col-8"
           mode="tags"
           maxTagTextLength="10"
           maxCount="5"
@@ -171,79 +195,102 @@ const MutualFunds = () => {
           Analyze
         </button>
       </div>
-      <div className="row d-flex justify-content-center">
-        <div className="mb-2">
-          <b>Performance</b>
-        </div>
-        <div style={{ height: "80%", overflow: "auto" }}>
-          <table class="table table-bordered table-hover bg-white">
-            <thead class="table-light">
-              <tr>
-                {TableDefinition.map((eachPeriod) => (
-                  <>
-                    <th>{eachPeriod.label}</th>
-                  </>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {fundsApiData &&
-                fundsApiData.map((eachFund, index) => (
-                  <tr>
-                    {TableDefinition.map((eachPeriod) => {
-                      const selFunds = selectedFunds;
-                      if (selFunds[index]) {
-                        if (eachPeriod.label == "Name") {
-                          var fundStr = selFunds[index].replace(
-                            "https://www.moneycontrol.com/mutual-funds/nav/",
-                            ""
-                          );
-                          fundStr = fundStr.split("/");
-                          var Name = fundStr[0];
-                          return <td>{Name.replaceAll("-", " ")}</td>;
-                        } else {
-                          return (
-                            <td>
-                              {eachPeriod.field.includes("Year")
-                                ? eachFund.data[eachPeriod.field]?.[
-                                    "Annualised Returns"
-                                  ]
-                                : eachFund.data[eachPeriod.field]?.[
-                                    "Absolute Returns"
-                                  ]}
-                            </td>
-                          );
-                        }
-                      }
-                    })}
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-
+      {loader ? (
+        <Loader />
+      ) : (
+        <div
+          className="row justify-content-center"
+          style={
+            fundsApiData.length > 0 ? { display: "flex" } : { display: "none" }
+          }
+        >
           <div className="mb-2">
-            <b>Average CAGR</b>
+            <b>Performance</b>
           </div>
-          <table class="table table-bordered table-hover bg-white">
-            <thead class="table-light">
-              <tr>
-                {TableDefinition.map((eachPeriod) => (
-                  <>
-                    <th>
-                      {eachPeriod.label == "Name" ? "" : eachPeriod.label}
-                    </th>
-                  </>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {avgApiData && avgApiData.map((val, index) => <td>{val}</td>)}
-              </tr>
-            </tbody>
-          </table>
+          <div style={{ height: "80%", overflow: "auto" }}>
+            <table class="table table-bordered table-hover bg-white">
+              <thead class="table-light">
+                <tr>
+                  {TableDefinition.map((eachPeriod) => (
+                    <>
+                      <th>{eachPeriod.label}</th>
+                    </>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {fundsApiData &&
+                  fundsApiData.map((eachFund, index) => (
+                    <tr>
+                      {TableDefinition.map((eachPeriod) => {
+                        const selFunds = selectedFunds;
+                        if (selFunds[index]) {
+                          if (eachPeriod.label == "Name") {
+                            var fundStr = selFunds[index].replace(
+                              "https://www.moneycontrol.com/mutual-funds/nav/",
+                              ""
+                            );
+                            fundStr = fundStr.split("/");
+                            var Name = fundStr[0];
+                            return <td>{Name.replaceAll("-", " ")}</td>;
+                          } else {
+                            return (
+                              <td>
+                                {eachPeriod.field.includes("Year")
+                                  ? eachFund.data[eachPeriod.field]?.[
+                                      "Annualised Returns"
+                                    ]
+                                  : eachFund.data[eachPeriod.field]?.[
+                                      "Absolute Returns"
+                                    ]}
+                              </td>
+                            );
+                          }
+                        }
+                      })}
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+
+            <div className="mb-2">
+              <b>Average CAGR</b>
+            </div>
+            <table class="table table-bordered table-hover bg-white">
+              <thead class="table-light">
+                <tr>
+                  {TableDefinition.map((eachPeriod) => (
+                    <>
+                      <th>
+                        {eachPeriod.label == "Name" ? "" : eachPeriod.label}
+                      </th>
+                    </>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {avgApiData && avgApiData.map((val, index) => <td>{val}</td>)}
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="row d-flex mt-3">
+              <div className="col-2">
+                <b>funds overlap Data:</b>
+              </div>
+              <div className="col-8">20%</div>
+              <div
+                className="col-2"
+                style={{ textDecoration: "underline", cursor: "pointer" }}
+              >
+                {" "}
+                Show More details
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
