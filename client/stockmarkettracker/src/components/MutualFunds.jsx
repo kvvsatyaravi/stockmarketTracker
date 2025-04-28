@@ -7,6 +7,7 @@ const MutualFunds = () => {
   const [searchValue, SetSearchValue] = useState("");
   const [selectedFunds, setSelectedFunds] = useState([]);
   const [fundsApiData, setFundsApiData] = useState([]);
+  const [portiflioApiData, setPortifolioApiData] = useState([]);
   const [avgApiData, setAvgApiData] = useState([]);
   const [loader, setLoader] = useState(false);
 
@@ -104,7 +105,9 @@ const MutualFunds = () => {
         fundsPortfoolioData.push({ ...each, url: fundsOrder[index] });
       });
       console.log(fundsPortfoolioData);
+      setPortifolioApiData(fundsPortfoolioData);
       setLoader(false);
+      getOverlappingStocks();
     });
   };
 
@@ -127,7 +130,6 @@ const MutualFunds = () => {
       setFundOptions(searchResponseData);
     }
   }, [response]);
-
 
   useEffect(() => {
     if (fundsApiData.length > 0) {
@@ -162,6 +164,55 @@ const MutualFunds = () => {
       setAvgApiData(total);
     }
   }, [fundsApiData]);
+
+  useEffect(() => {
+    if (portiflioApiData.length) {
+      getOverlappingStocks();
+    }
+  }, [portiflioApiData]);
+
+  const getOverlappingStocks = () => {
+    var alreadyCompared = [];
+    let overLapData = {};
+    var finalData = [];
+
+    portiflioApiData.forEach((eachFund) => {
+      var stockName;
+      eachFund.data.forEach((porfolioData) => {
+        stockName = porfolioData["Stock Invested in"];
+        if (!alreadyCompared.includes(stockName)) {
+          if (overLapData[stockName] == undefined) {
+            overLapData[stockName] = [];
+          }
+          overLapData[stockName].push({
+            name: eachFund.url
+              .split("/nav/")[1]
+              .split("/")[0]
+              .replaceAll("-", " "),
+            percentage: porfolioData["% of Total Holdings"],
+          });
+        }
+      });
+      alreadyCompared.push(stockName);
+    });
+
+    for (var i in overLapData) {
+      if (
+        overLapData[i].length ==
+          (selectedFunds.length == 2
+            ? selectedFunds.length
+            : selectedFunds.length - 1) &&
+        selectedFunds.length > 1
+      ) {
+        finalData.push({
+          stockName: i,
+          funds: overLapData[i],
+        });
+      }
+    }
+
+    console.log(finalData);
+  };
 
   return (
     <div className="container">
@@ -283,9 +334,55 @@ const MutualFunds = () => {
               <div
                 className="col-2"
                 style={{ textDecoration: "underline", cursor: "pointer" }}
+                data-toggle="modal"
+                data-target="#exampleModalLong"
               >
                 {" "}
                 Show More details
+              </div>
+
+              {/* <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
+  Launch demo modal
+</button> */}
+            </div>
+
+            <div
+              class="modal fade"
+              id="exampleModalLong"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="exampleModalLongTitle"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">
+                      Modal title
+                    </h5>
+                    <button
+                      type="button"
+                      class="close"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">...</div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                      Save changes
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
