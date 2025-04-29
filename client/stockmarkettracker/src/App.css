@@ -11,6 +11,10 @@ body {
   border: #ff914c !important;
 }
 
+.overlap-modal{
+  max-width:70vw !important;
+}
+
 .sidebar {
   background-color: #0b1a47;
   color: white;

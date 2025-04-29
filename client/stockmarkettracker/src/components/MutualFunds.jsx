@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Select } from "antd";
 import { useGetApiData, Loader } from "./commonUtils";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
 const MutualFunds = () => {
   const [fundOptions, setFundOptions] = useState([]);
@@ -8,8 +10,10 @@ const MutualFunds = () => {
   const [selectedFunds, setSelectedFunds] = useState([]);
   const [fundsApiData, setFundsApiData] = useState([]);
   const [portiflioApiData, setPortifolioApiData] = useState([]);
+  const [overLapData,setOverLapData] = useState([]);
   const [avgApiData, setAvgApiData] = useState([]);
   const [loader, setLoader] = useState(false);
+  const [show, setShow] = useState(false);
 
   const TableDefinition = [
     {
@@ -184,26 +188,14 @@ const MutualFunds = () => {
           if (overLapData[stockName] == undefined) {
             overLapData[stockName] = [];
           }
-          overLapData[stockName].push({
-            name: eachFund.url
-              .split("/nav/")[1]
-              .split("/")[0]
-              .replaceAll("-", " "),
-            percentage: porfolioData["% of Total Holdings"],
-          });
+          overLapData[stockName].push({ name: eachFund.url.split("/nav/")[1].split("/")[0].replaceAll("-", " "), percentage: porfolioData["% of Total Holdings"] });
         }
       });
       alreadyCompared.push(stockName);
     });
 
     for (var i in overLapData) {
-      if (
-        overLapData[i].length ==
-          (selectedFunds.length == 2
-            ? selectedFunds.length
-            : selectedFunds.length - 1) &&
-        selectedFunds.length > 1
-      ) {
+      if (overLapData[i].length >= (selectedFunds.length == 2 ? selectedFunds.length : selectedFunds.length - 2) && selectedFunds.length > 1) {
         finalData.push({
           stockName: i,
           funds: overLapData[i],
@@ -212,7 +204,10 @@ const MutualFunds = () => {
     }
 
     console.log(finalData);
+    finalData = finalData.sort((a, b) => b["funds"].length - a["funds"].length);
+    setOverLapData(finalData);
   };
+
 
   return (
     <div className="container">
@@ -234,6 +229,7 @@ const MutualFunds = () => {
             console.log(evt);
             setFundsApiData(fundsApiData.filter((e) => e.url != evt));
             setSelectedFunds(selectedFunds.filter((e) => e != evt));
+            setPortifolioApiData(portiflioApiData.filter((e) => e.url != evt));
           }}
           style={{ width: "45%" }}
           options={fundOptions}
@@ -336,56 +332,60 @@ const MutualFunds = () => {
                 style={{ textDecoration: "underline", cursor: "pointer" }}
                 data-toggle="modal"
                 data-target="#exampleModalLong"
+                onClick={() => {
+                  setShow(true);
+                }}
               >
                 {" "}
                 Show More details
               </div>
-
-              {/* <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
-  Launch demo modal
-</button> */}
-            </div>
-
-            <div
-              class="modal fade"
-              id="exampleModalLong"
-              tabindex="-1"
-              role="dialog"
-              aria-labelledby="exampleModalLongTitle"
-              aria-hidden="true"
-            >
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">
-                      Modal title
-                    </h5>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-label="Close"
-                    >
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">...</div>
-                  <div class="modal-footer">
-                    <button
-                      type="button"
-                      class="btn btn-secondary"
-                      data-dismiss="modal"
-                    >
-                      Close
-                    </button>
-                    <button type="button" class="btn btn-primary">
-                      Save changes
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
+
+          <Modal
+            show={show}
+            scrollable={true}
+            onHide={() => setShow(false)}
+            dialogClassName="overlap-modal"
+            aria-labelledby="example-custom-modal-styling-title"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title id="example-custom-modal-styling-title">
+                Overlapping Stocks
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <table class="table table-bordered table-hover bg-white">
+                <thead class="table-light">
+                  <tr>
+                    <th style={{ width: "30%" }}>Stock</th>
+                    <th>Fund Name</th>
+                    <th style={{ width: "15%" }}>Percentage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {overLapData &&
+                    overLapData.map((eachStock, index) => (
+                      <tr key={index}>
+                        <th>{eachStock.stockName}</th>
+                        <td>
+                          {eachStock.funds.length &&
+                            eachStock.funds.map((eachFund) => (
+                              <div className="mb-2">{eachFund.name}</div>
+                            ))}
+                        </td>
+                        <td>
+                          {eachStock.funds.length &&
+                            eachStock.funds.map((eachFund) => (
+                              <div className="mb-2">{eachFund.percentage}</div>
+                            ))}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </Modal.Body>
+          </Modal>
         </div>
       )}
     </div>
