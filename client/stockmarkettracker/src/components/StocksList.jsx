@@ -2,71 +2,209 @@ import React, { useEffect, useState } from "react";
 
 function StocksList() {
   const [StocksData, setStocksData] = useState([]);
+  const [stocksTableObj, setStocksTableObj] = useState({
+    "All Stocks": [
+      {
+        name: "bse",
+        "Add/Edit": "12-03-22",
+        CurrentPrice: 1234,
+        TargetPrice: 4332,
+        Priority: "Medium",
+        ChangeDiff: 10,
+      },
+      {
+        name: "nse",
+        "Add/Edit": "12-03-22",
+        CurrentPrice: 1234,
+        TargetPrice: 4332,
+        Priority: "High",
+        ChangeDiff: 10,
+      },
+      {
+        name: "bse",
+        "Add/Edit": "12-03-22",
+        CurrentPrice: 1234,
+        TargetPrice: 4332,
+        Priority: "Medium",
+        ChangeDiff: 10,
+      },
+      {
+        name: "nse",
+        "Add/Edit": "12-03-22",
+        CurrentPrice: 1234,
+        TargetPrice: 4332,
+        Priority: "High",
+        ChangeDiff: 10,
+      },
+    ],
+    "Near Targets": [
+      {
+        name: "bse",
+        "Add/Edit": "12-03-22",
+        CurrentPrice: 1234,
+        TargetPrice: 4332,
+        Priority: "Medium",
+        ChangeDiff: 10,
+      },
+      {
+        name: "nse",
+        "Add/Edit": "12-03-22",
+        CurrentPrice: 1234,
+        TargetPrice: 4332,
+        Priority: "High",
+        ChangeDiff: 10,
+      },
+    ],
+    "Far Targets": [
+      {
+        name: "nse",
+        "Add/Edit": "12-03-22",
+        CurrentPrice: 1234,
+        TargetPrice: 4332,
+        Priority: "High",
+        ChangeDiff: 10,
+      },
+    ],
+  });
+  const [activeTab, setActiveTab] = useState("All Stocks");
 
   const stocksTableDefinition = [
     {
-      field: "Name",
+      field: "name",
       Label: "Name",
+      width: "15%",
     },
     {
-      Label: "Price",
-      field: "LTP",
+      Label: "Add/Edit",
+      field: "Add/Edit",
+      width: "15%",
     },
     {
-      field: "%Chg",
-      Label: "Change",
+      field: "CurrentPrice",
+      Label: "Current Price",
+      width: "15%",
+    },
+    {
+      field: "TargetPrice",
+      Label: "Target Price",
+      width: "15%",
+    },
+    {
+      field: "Priority",
+      Label: "Priority",
+      width: "15%",
+    },
+    {
+      field: "ChangeDiff",
+      Label: "Change Difference",
+      width: "15%",
     },
   ];
+
+  useEffect(() => {
+    // setStocksTableObj({
+    //   "All Stocks": [
+    //     {
+    //       name: "bse",
+    //       "Add/Edit": "12-03-22",
+    //       CurrentPrice: 1234,
+    //       TargetPrice: 4332,
+    //       Priority: "Medium",
+    //       ChangeDiff: 10,
+    //     },
+    //     {
+    //       name: "nse",
+    //       "Add/Edit": "12-03-22",
+    //       CurrentPrice: 1234,
+    //       TargetPrice: 4332,
+    //       Priority: "High",
+    //       ChangeDiff: 10,
+    //     },
+    //     {
+    //       name: "bse",
+    //       "Add/Edit": "12-03-22",
+    //       CurrentPrice: 1234,
+    //       TargetPrice: 4332,
+    //       Priority: "Medium",
+    //       ChangeDiff: 10,
+    //     },
+    //     {
+    //       name: "nse",
+    //       "Add/Edit": "12-03-22",
+    //       CurrentPrice: 1234,
+    //       TargetPrice: 4332,
+    //       Priority: "High",
+    //       ChangeDiff: 10,
+    //     },
+    //   ],
+    //   "Near Targets": [
+    //     {
+    //       name: "bse",
+    //       "Add/Edit": "12-03-22",
+    //       CurrentPrice: 1234,
+    //       TargetPrice: 4332,
+    //       Priority: "Medium",
+    //       ChangeDiff: 10,
+    //     },
+    //     {
+    //       name: "nse",
+    //       "Add/Edit": "12-03-22",
+    //       CurrentPrice: 1234,
+    //       TargetPrice: 4332,
+    //       Priority: "High",
+    //       ChangeDiff: 10,
+    //     },
+    //   ],
+    //   "Far Targets": [
+    //     {
+    //       name: "nse",
+    //       "Add/Edit": "12-03-22",
+    //       CurrentPrice: 1234,
+    //       TargetPrice: 4332,
+    //       Priority: "High",
+    //       ChangeDiff: 10,
+    //     },
+    //   ],
+    // });
+  }, []);
 
   const requestOptions = {
     method: "GET",
     redirect: "follow",
   };
 
- 
-
   return (
     <>
       <div class="d-flex justify-content-between mb-3">
-        <div>
-          <ul class="nav nav-tabs">
-            <li class="nav-item">
-              <a class="nav-link active" href="#">
-                All Stocks <span class="badge bg-primary">10</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                Near Targets
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                Far Targets
-              </a>
-            </li>
-          </ul>
+        <div className="stockslist-tabs justify-content-between">
+          {Object.keys(stocksTableObj).map((eachTab) => (
+            <div
+              className={
+                "stocks-tabs " + (eachTab == activeTab ? "active-tab" : "")
+              }
+              onClick={() => {
+                setActiveTab(eachTab);
+              }}
+            >
+              <b>{eachTab}</b>
+              <b className="stocks-tabs-number">{15}</b>
+            </div>
+          ))}
         </div>
-        {/* <div class="d-flex">
-<input class="form-control me-2" type="search" placeholder="Stock Name">
-<button class="btn btn-warning">Positional Trading</button>
-</div> */}
       </div>
       <div style={{ height: "80%", overflow: "auto" }}>
-        <table class="table table-bordered table-hover bg-white">
+        <table class="table table-bordered table-hover bg-white" border={0}>
           <thead class="table-light">
             <tr>
-              <th>Name</th>
-              {/* <th>Add/Edit Date</th> */}
-              <th>Current Price</th>
-              {/* <th>Target Price</th>
-        <th>Priority</th> */}
-              <th>Change Diff</th>
-              <th></th>
+              {stocksTableDefinition.map((e) => (
+                <>
+                  <th style={{ width: e.width }}>{e.Label}</th>
+                </>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {StocksData.map((eachStock) => (
+            {stocksTableObj[activeTab].map((eachStock) => (
               <tr>
                 {stocksTableDefinition.map((e) => (
                   <>

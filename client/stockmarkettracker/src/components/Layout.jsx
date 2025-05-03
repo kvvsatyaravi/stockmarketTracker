@@ -6,6 +6,7 @@ import Checklists from "./CheckLists";
 import { Routes, Route, Navigate } from "react-router";
 import SidePanel from "./SidePanel";
 import { StockmarketContext } from "./commonUtils";
+import './layout.css';
 
 function Layout() {
   const [exchangeData,setExchangeData] = useState({});
