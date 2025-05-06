@@ -32,3 +32,15 @@
     font-size: 12px;
     margin-top: 3px;
 }
+
+#dropdown-shocks-button{
+    background: #ff914c;
+    border:none
+}
+
+
+.ant-typography {
+    border-bottom: 2px solid rgb(255, 146, 76);
+    padding-bottom: 5px;
+    width: 100%;
+  }

@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { Select } from "antd";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { AddStockModal, DeleteStockModal } from "./StockModels";
 
 function StocksList() {
   const [StocksData, setStocksData] = useState([]);
+  const [AddModelToggle, setAddModelToggle] = useState(false);
+  const [deleteModelToggle, setDeleteModelToggle] = useState(false);
   const [stocksTableObj, setStocksTableObj] = useState({
     "All Stocks": [
       {
@@ -99,6 +106,16 @@ function StocksList() {
       Label: "Change Difference",
       width: "15%",
     },
+    {
+      Label: "Modify",
+      format: "edit",
+      width: "5%",
+    },
+    {
+      Label: "Delete",
+      format: "delete",
+      width: "5%",
+    },
   ];
 
   useEffect(() => {
@@ -168,6 +185,10 @@ function StocksList() {
     // });
   }, []);
 
+  const handleChange = (value) => {
+    console.log(value); // { value: "lucy", key: "lucy", label: "Lucy (101)" }
+  };
+
   const requestOptions = {
     method: "GET",
     redirect: "follow",
@@ -191,6 +212,33 @@ function StocksList() {
             </div>
           ))}
         </div>
+
+        <div style={{ display: "flex", gap: "15px" }}>
+          <Select
+            labelInValue
+            defaultValue={{ value: "lucy", label: "Lucy (101)" }}
+            style={{ width: 120 }}
+            onChange={handleChange}
+            options={[
+              {
+                value: "jack",
+                label: "Jack (100)",
+              },
+              {
+                value: "lucy",
+                label: "Lucy (101)",
+              },
+            ]}
+          />
+          <DropdownButton
+            id="dropdown-shocks-button"
+            title="positional trading"
+            size="sm"
+          >
+            <Dropdown.Item href="#/action-1">positional trading</Dropdown.Item>
+            <Dropdown.Item href="#/action-3">Investment</Dropdown.Item>
+          </DropdownButton>
+        </div>
       </div>
       <div style={{ height: "80%", overflow: "auto" }}>
         <table class="table table-bordered table-hover bg-white" border={0}>
@@ -198,7 +246,9 @@ function StocksList() {
             <tr>
               {stocksTableDefinition.map((e) => (
                 <>
-                  <th style={{ width: e.width }}>{e.Label}</th>
+                  <th className="text-center" style={{ width: e.width }}>
+                    {e.Label}
+                  </th>
                 </>
               ))}
             </tr>
@@ -206,15 +256,51 @@ function StocksList() {
           <tbody>
             {stocksTableObj[activeTab].map((eachStock) => (
               <tr>
-                {stocksTableDefinition.map((e) => (
-                  <>
-                    <td>{eachStock[e.field]}</td>
-                  </>
-                ))}
+                {stocksTableDefinition.map((e) =>
+                  e.format ? (
+                    e.format == "edit" ? (
+                      <>
+                        <td
+                          className="text-center"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => setAddModelToggle(!AddModelToggle)}
+                        >
+                          <EditOutlined />
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td
+                          className="text-center"
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            setDeleteModelToggle(!deleteModelToggle)
+                          }
+                        >
+                          <DeleteOutlined />
+                        </td>
+                      </>
+                    )
+                  ) : (
+                    <>
+                      <td className="text-center">{eachStock[e.field]}</td>
+                    </>
+                  )
+                )}
               </tr>
             ))}
           </tbody>
         </table>
+
+        <AddStockModal
+          visible={AddModelToggle}
+          onClose={() => setAddModelToggle(!AddModelToggle)}
+        />
+
+        <DeleteStockModal
+          visible={deleteModelToggle}
+          onClose={() => setDeleteModelToggle(!deleteModelToggle)}
+        />
       </div>
     </>
   );

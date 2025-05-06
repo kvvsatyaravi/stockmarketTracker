@@ -1,0 +1,106 @@
+import React, { useState } from "react";
+import { Modal, Form, Input, Select, Button, Row, Col, Typography } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
+
+const { Option } = Select;
+const { Title } = Typography;
+
+const AddStockModal = ({ visible, onClose }) => {
+  const [form] = Form.useForm();
+  const [livePrice, setLivePrice] = useState(20.56);
+
+  const refreshPrice = () => {
+    const newPrice = (Math.random() * 100).toFixed(2);
+    setLivePrice(newPrice);
+  };
+
+  const handleReset = () => {
+    form.resetFields();
+    setLivePrice(0);
+  };
+
+  const handleSubmit = () => {
+    form.validateFields().then((values) => {
+      const data = {
+        ...values,
+        livePrice,
+      };
+      console.log("Submitted:", data);
+      onClose();
+    });
+  };
+
+  return (
+    <Modal open={visible} onCancel={onClose} footer={null} title={<Title level={5}>Add / Edit Stock Details</Title>}>
+      <Form
+        form={form}
+        layout="horizontal"
+        labelCol={{ span: 6 }}
+        initialValues={{
+          stockName: "Infosys",
+          targetPrice: 3205.5,
+          priority: "High",
+          investmentType: "Positional",
+        }}
+      >
+        <Form.Item name="stockName" label="Stock Name" rules={[{ required: true }]}>
+          <Input className="col-6" />
+        </Form.Item>
+
+        <Form.Item label="Live Price">
+          <Row align="middle" gutter={8}>
+            <Col className="col-2">{livePrice}</Col>
+            <Col style={{ background: "lightgrey", borderRadius: "10px" }}>
+              <ReloadOutlined onClick={refreshPrice} style={{ color: "#fa8c16", cursor: "pointer" }} />
+            </Col>
+          </Row>
+        </Form.Item>
+
+        <Form.Item name="targetPrice" label="Target Price" rules={[{ required: true }]}>
+          <Input type="number" className="col-3" />
+        </Form.Item>
+
+        <Form.Item name="priority" label="Priority Level">
+          <Select style={{ width: 120 }}>
+            <Option value="High">High</Option>
+            <Option value="Medium">Medium</Option>
+            <Option value="Low">Low</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item name="investmentType" label="Investment Type">
+          <Select style={{ width: 120 }}>
+            <Option value="Positional">Positional</Option>
+            <Option value="Intraday">Intraday</Option>
+          </Select>
+        </Form.Item>
+
+        <div className="d-flex justify-content-end gap-2 mt-3">
+          <Button style={{ background: "#ff924c", color: "white", border: "none" }} onClick={handleReset}>
+            Reset
+          </Button>
+          <Button type="primary" style={{ background: "#091A52" }} onClick={handleSubmit}>
+            Add / Edit
+          </Button>
+        </div>
+      </Form>
+    </Modal>
+  );
+};
+
+const DeleteStockModal = ({ visible, onClose }) => {
+  return (
+    <Modal open={visible} onCancel={onClose} footer={null} title={<Title level={5}>Delete Stock Details</Title>}>
+      <h6>Are you sure want to delete ?</h6>
+      <div className="d-flex justify-content-center gap-2 mt-3">
+        <Button className="col-2" type="primary" style={{ background: "#091A52" }}>
+          Yes
+        </Button>
+        <Button className="col-2" style={{ background: "#ff924c", color: "white", border: "none" }}>
+          No
+        </Button>
+      </div>
+    </Modal>
+  );
+};
+export { AddStockModal, DeleteStockModal };
