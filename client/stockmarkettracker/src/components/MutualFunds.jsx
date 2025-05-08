@@ -10,7 +10,7 @@ const MutualFunds = () => {
   const [selectedFunds, setSelectedFunds] = useState([]);
   const [fundsApiData, setFundsApiData] = useState([]);
   const [portiflioApiData, setPortifolioApiData] = useState([]);
-  const [overLapData,setOverLapData] = useState([]);
+  const [overLapData, setOverLapData] = useState([]);
   const [avgApiData, setAvgApiData] = useState([]);
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
@@ -188,14 +188,26 @@ const MutualFunds = () => {
           if (overLapData[stockName] == undefined) {
             overLapData[stockName] = [];
           }
-          overLapData[stockName].push({ name: eachFund.url.split("/nav/")[1].split("/")[0].replaceAll("-", " "), percentage: porfolioData["% of Total Holdings"] });
+          overLapData[stockName].push({
+            name: eachFund.url
+              .split("/nav/")[1]
+              .split("/")[0]
+              .replaceAll("-", " "),
+            percentage: porfolioData["% of Total Holdings"],
+          });
         }
       });
       alreadyCompared.push(stockName);
     });
 
     for (var i in overLapData) {
-      if (overLapData[i].length >= (selectedFunds.length == 2 ? selectedFunds.length : selectedFunds.length - 2) && selectedFunds.length > 1) {
+      if (
+        overLapData[i].length >=
+          (selectedFunds.length == 2
+            ? selectedFunds.length
+            : selectedFunds.length - 2) &&
+        selectedFunds.length > 1
+      ) {
         finalData.push({
           stockName: i,
           funds: overLapData[i],
@@ -208,11 +220,12 @@ const MutualFunds = () => {
     setOverLapData(finalData);
   };
 
-
   return (
     <div className="container">
       <div className="row d-flex justify-content-center">
         <Select
+          showSearch
+          filterOption={false}
           className="col-8"
           mode="tags"
           maxTagTextLength="10"
