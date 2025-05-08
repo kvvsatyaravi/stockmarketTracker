@@ -119,7 +119,8 @@ const MutualFunds = () => {
     method: "get",
     url:
       "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/searchSuggestion?fundName=" +
-      searchValue,
+      searchValue +
+      "&type=2",
   });
 
   useEffect(() => {
