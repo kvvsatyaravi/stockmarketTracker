@@ -6,6 +6,7 @@ import datetime
 import time
 from .Scripts import Apis
 from .Scripts.Functions import fetchExchangeData
+from bs4 import BeautifulSoup
 
 # import FetchAllData
         
@@ -42,6 +43,46 @@ def getMutualFundSuggestions(request):
     return Response({
         'response':"true",
         'data':muutualFundsSuggestions
+        })
+
+@api_view(['GET'])
+def getStockLivePrice(request):
+    startTime = time.time()
+    url = request.query_params['stockUrl']
+    html_parser = "html.parser"
+    nsePrice = '-'
+    bsePrice = '-'
+
+    try:
+        soup = BeautifulSoup(requests.get(url, timeout=60).text, html_parser)
+        bsePrice = soup.select("div.inprice1.bsecp")
+        bsePrice = bsePrice[0].get_text()
+        nsePrice = soup.select("div.inprice1.nsecp")
+        nsePrice = nsePrice[0].get_text()
+
+    except IndexError:
+        if soup.select("div#sp_low"):
+            nsePrice = soup.select("div#sp_low")[0].get_text()
+            bsePrice = soup.select("div#sp_low")[0].get_text()
+        else:
+            nsePrice = soup.select("div.nsestkcp.bsestkcp")[0].get_text()
+            bsePrice = soup.select("div.nsestkcp.bsestkcp")[0].get_text()
+
+    finally:
+        endTime = time.time()
+        # get the execution time
+        elapsed_time = int(endTime - startTime)
+        elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
+
+        responseData = {
+            "nsePrice":nsePrice,
+            "bsePrice":bsePrice,
+            "executedTime":elapsed_time
+        }
+        
+        return Response({
+        'response':"true",
+        'data':responseData
         })
 
 @api_view(["Get"])
@@ -85,12 +126,7 @@ def bseStocksData(request):
 @api_view(["get"])
 def nseStocksData(request):
     startTime = time.time()
-    nseIndexsUrls = [
-        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=136&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",
-        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=111&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",
-        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=114&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",
-        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=7&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true",
-        "https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=135&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true"]
+    nseIndexsUrls = ["https://www.moneycontrol.com/markets/indian-indices/changeTableData?deviceType=web&exName=N&indicesID=136&selTab=o&subTabOT=o&subTabOPL=cl&selPage=marketTerminal&classic=true"]
     
     data = fetchExchangeData(nseIndexsUrls)
     endTime = time.time()

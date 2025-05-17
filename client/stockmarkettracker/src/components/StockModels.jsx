@@ -89,7 +89,6 @@ const AddStockModal = ({ visible, onClose }) => {
           label="Stock Name"
           rules={[{ required: true }]}
         >
-          <Input className="col-6" />
           <Select
             showSearch
             filterOption={false}

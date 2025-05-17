@@ -6,5 +6,6 @@ urlpatterns = [
     path('getNSEData/',views.nseStocksData,name='nseStocksData'),
     path('getBSEData/',views.bseStocksData,name='bseStocksData'),
     path('mutualFundReturnData/',views.getFundPerformanceData,name='mutualFundReturnData'),
-    path('searchSuggestion',views.getSearchSuggerstions,name='searchSuggestion')
+    path('searchSuggestion',views.getSearchSuggerstions,name='searchSuggestion'),
+    path('getStockLivePrice/',views.getStockLivePrice,name='stockLivePrice')
 ]
