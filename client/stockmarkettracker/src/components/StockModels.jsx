@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useMemo } from "react";
 import { Modal, Form, Input, Select, Button, Row, Col, Typography } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import { useGetApiData } from "./commonUtils";
@@ -6,19 +6,17 @@ import { useGetApiData } from "./commonUtils";
 const { Option } = Select;
 const { Title } = Typography;
 
-const AddStockModal = ({ visible, onClose }) => {
+const AddStockModal = ({ visible, onClose, type, selStock }) => {
   const [form] = Form.useForm();
   const [livePrice, setLivePrice] = useState(0);
   const [stockOptions, setStockOptions] = useState([]);
   const [searchValue, SetSearchValue] = useState("");
   const [selStockApiUrl, setSelStockApiUrl] = useState("");
+  const [intiVal, setIntiVal] = useState({});
 
   const { response, loading, error } = useGetApiData({
     method: "get",
-    url:
-      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/searchSuggestion?fundName=" +
-      searchValue +
-      "&type=1",
+    url: "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/searchSuggestion?fundName=" + searchValue + "&type=1",
   });
 
   useEffect(() => {
@@ -33,6 +31,10 @@ const AddStockModal = ({ visible, onClose }) => {
       setStockOptions(searchResponseData);
     }
   }, [response]);
+
+  useMemo(() => {
+    if (selStock) setIntiVal({ name: selStock.name, currentPrice: selStock.CurrentPrice, TargetPrice: selStock.TargetPrice, Priority: selStock.Priority, investmentType: "Positional" });
+  }, [selStock]);
 
   const handleReset = () => {
     form.resetFields();
@@ -53,10 +55,7 @@ const AddStockModal = ({ visible, onClose }) => {
   const getStockLivePrice = (value) => {
     if (value != selStockApiUrl) setSelStockApiUrl(value);
 
-    fetch(
-      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getStockLivePrice/?stockUrl=" +
-        value
-    )
+    fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getStockLivePrice/?stockUrl=" + value)
       .then((e) => e.json())
       .then((e) => {
         var price;
@@ -68,46 +67,33 @@ const AddStockModal = ({ visible, onClose }) => {
   };
 
   return (
-    <Modal
-      open={visible}
-      onCancel={onClose}
-      footer={null}
-      title={<Title level={5}>Add / Edit Stock Details</Title>}
-    >
-      <Form
-        form={form}
-        layout="horizontal"
-        labelCol={{ span: 6 }}
-        initialValues={{
-          targetPrice: 3205.5,
-          priority: "High",
-          investmentType: "Positional",
-        }}
-      >
-        <Form.Item
-          name="stockName"
-          label="Stock Name"
-          rules={[{ required: true }]}
-        >
-          <Select
-            showSearch
-            filterOption={false}
-            onKeyUp={(evt) => {
-              console.log(evt.target.value);
-              SetSearchValue(evt.target.value);
-            }}
-            onSelect={(evt) => {
-              getStockLivePrice(evt);
-            }}
-            placeholder="Please select"
-            options={stockOptions}
-            style={{ width: "75%" }}
-          />
+    <Modal open={visible} onCancel={onClose} footer={null} title={<Title level={5}>{type} Stock Details</Title>}>
+      <Form form={form} layout="horizontal" labelCol={{ span: 6 }} initialValues={intiVal}>
+        <Form.Item name="name" label="Stock Name" rules={[{ required: true }]}>
+          {/* <Input className="col-6" /> */}
+          {type == "Add" ? (
+            <Select
+              showSearch
+              filterOption={false}
+              onKeyUp={(evt) => {
+                console.log(evt.target.value);
+                SetSearchValue(evt.target.value);
+              }}
+              onSelect={(evt) => {
+                getStockLivePrice(evt);
+              }}
+              placeholder="Please select"
+              options={stockOptions}
+              style={{ width: "75%" }}
+            />
+          ) : (
+            <Select style={{ width: "75%" }} suffixIcon={false} disabled={true} />
+          )}
         </Form.Item>
 
-        <Form.Item label="Live Price">
+        <Form.Item label="Live Price" name="currentPrice">
           <Row align="middle" gutter={8}>
-            <Col className="col-3">{livePrice}</Col>
+            <Col className="col-3">{type == "Add" ? livePrice : ""}</Col>
             <Col style={{ background: "lightgrey", borderRadius: "10px" }}>
               <ReloadOutlined
                 onClick={() => {
@@ -119,15 +105,11 @@ const AddStockModal = ({ visible, onClose }) => {
           </Row>
         </Form.Item>
 
-        <Form.Item
-          name="targetPrice"
-          label="Target Price"
-          rules={[{ required: true }]}
-        >
+        <Form.Item name="TargetPrice" label="Target Price" rules={[{ required: true }]}>
           <Input type="number" className="col-3" />
         </Form.Item>
 
-        <Form.Item name="priority" label="Priority Level">
+        <Form.Item name="Priority" label="Priority Level">
           <Select style={{ width: 120 }}>
             <Option value="High">High</Option>
             <Option value="Medium">Medium</Option>
@@ -143,18 +125,11 @@ const AddStockModal = ({ visible, onClose }) => {
         </Form.Item>
 
         <div className="d-flex justify-content-end gap-2 mt-3">
-          <Button
-            style={{ background: "#ff924c", color: "white", border: "none" }}
-            onClick={handleReset}
-          >
+          <Button style={{ background: "#ff924c", color: "white", border: "none" }} onClick={handleReset}>
             Reset
           </Button>
-          <Button
-            type="primary"
-            style={{ background: "#091A52" }}
-            onClick={handleSubmit}
-          >
-            Add / Edit
+          <Button type="primary" style={{ background: "#091A52" }} onClick={handleSubmit}>
+            Submit
           </Button>
         </div>
       </Form>

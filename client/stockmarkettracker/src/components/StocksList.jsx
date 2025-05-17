@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Select } from "antd";
+import React, { useEffect, useState, useRef } from "react";
+import { Button, Select, Input } from "antd";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined,SearchOutlined } from "@ant-design/icons";
 import { AddStockModal, DeleteStockModal } from "./StockModels";
 
 function StocksList() {
   const [StocksData, setStocksData] = useState([]);
-  const [AddModelToggle, setAddModelToggle] = useState(false);
-  const [deleteModelToggle, setDeleteModelToggle] = useState(false);
+  const [Toggle, setToggle] = useState({
+    add: false,
+    delete: false,
+    edit: false,
+  });
   const [stocksTableObj, setStocksTableObj] = useState({
     "All Stocks": [
       {
@@ -74,6 +77,7 @@ function StocksList() {
     ],
   });
   const [activeTab, setActiveTab] = useState("All Stocks");
+  const selStock = useRef({});
 
   const stocksTableDefinition = [
     {
@@ -185,6 +189,14 @@ function StocksList() {
     // });
   }, []);
 
+  const toogleModal = (name, toggle) => {
+    setToggle((prev) => {
+      var initialValues = { add: false, delete: false, edit: false };
+      initialValues[name] = toggle;
+      return initialValues;
+    });
+  };
+
   const handleChange = (value) => {
     console.log(value); // { value: "lucy", key: "lucy", label: "Lucy (101)" }
   };
@@ -214,28 +226,20 @@ function StocksList() {
         </div>
 
         <div style={{ display: "flex", gap: "15px" }}>
-          <Select
-            labelInValue
-            defaultValue={{ value: "lucy", label: "Lucy (101)" }}
-            style={{ width: 120 }}
-            onChange={handleChange}
-            options={[
-              {
-                value: "jack",
-                label: "Jack (100)",
-              },
-              {
-                value: "lucy",
-                label: "Lucy (101)",
-              },
-            ]}
+          <Button onClick={() => toogleModal("add", true)}>
+            <PlusOutlined />
+          </Button>
+          <Input
+            placeholder="Search Stocks"
+            prefix={<SearchOutlined />}
+            
           />
           <DropdownButton
             id="dropdown-shocks-button"
-            title="positional trading"
+            title="Positional trading"
             size="sm"
           >
-            <Dropdown.Item href="#/action-1">positional trading</Dropdown.Item>
+            <Dropdown.Item href="#/action-1">Positional trading</Dropdown.Item>
             <Dropdown.Item href="#/action-3">Investment</Dropdown.Item>
           </DropdownButton>
         </div>
@@ -263,7 +267,7 @@ function StocksList() {
                         <td
                           className="text-center"
                           style={{ cursor: "pointer" }}
-                          onClick={() => setAddModelToggle(!AddModelToggle)}
+                          onClick={() => toogleModal("edit", true)}
                         >
                           <EditOutlined />
                         </td>
@@ -273,9 +277,7 @@ function StocksList() {
                         <td
                           className="text-center"
                           style={{ cursor: "pointer" }}
-                          onClick={() =>
-                            setDeleteModelToggle(!deleteModelToggle)
-                          }
+                          onClick={() => toogleModal("delete", true)}
                         >
                           <DeleteOutlined />
                         </td>
@@ -293,13 +295,19 @@ function StocksList() {
         </table>
 
         <AddStockModal
-          visible={AddModelToggle}
-          onClose={() => setAddModelToggle(!AddModelToggle)}
+          visible={Toggle.add}
+          onClose={() => toogleModal("add", false)}
+          type="Add"
         />
-
+        <AddStockModal
+          visible={Toggle.edit}
+          selStock={selStock.current}
+          onClose={() => toogleModal("edit", false)}
+          type="Edit"
+        />
         <DeleteStockModal
-          visible={deleteModelToggle}
-          onClose={() => setDeleteModelToggle(!deleteModelToggle)}
+          visible={Toggle.delete}
+          onClose={() => toogleModal("delete", false)}
         />
       </div>
     </>
