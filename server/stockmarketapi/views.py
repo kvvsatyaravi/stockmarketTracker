@@ -7,6 +7,7 @@ import time
 from .Scripts import Apis
 from .Scripts.Functions import fetchExchangeData
 from bs4 import BeautifulSoup
+from stockmarketapi.models import StockInfo,User
 
 # import FetchAllData
         
@@ -96,7 +97,7 @@ def getFundPerformanceData(request):
 
 @api_view(["Get"])
 def getSearchSuggerstions(request):
-    searchUrl = "https://www.moneycontrol.com/mccode/common/autosuggestion_solr.php?classic=true&query="+request.query_params['fundName']+"&type=2&format=json&main=true"
+    searchUrl = "https://www.moneycontrol.com/mccode/common/autosuggestion_solr.php?classic=true&query="+request.query_params['fundName']+"&type="+request.query_params['type']+"&format=json&main=true"
     Data = fetchAllData.getSearchSuggestions(searchUrl)
     return Response({
         'response':"true",
@@ -143,4 +144,14 @@ def nseStocksData(request):
         }
     }
     return Response(responseData)
+
+@api_view(["get"])
+def insertStocksData(request):
+    StockInfo(user= User.objects.get(username='ravi'),TargetPrice='56',Priority='Medium',tradingType='Positional Trading',StockName='Arihant capital').save()
+    responseData = {
+            "result":True,
+    }
+    return Response(responseData)
+
+
 
