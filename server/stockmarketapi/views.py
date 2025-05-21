@@ -8,6 +8,7 @@ from .Scripts import Apis
 from .Scripts.Functions import fetchExchangeData
 from bs4 import BeautifulSoup
 from stockmarketapi.models import StockInfo,User
+from django.shortcuts import get_object_or_404, render, HttpResponseRedirect
 
 # import FetchAllData
         
@@ -145,13 +146,12 @@ def nseStocksData(request):
     }
     return Response(responseData)
 
-@api_view(["get"])
-def insertStocksData(request):
-    StockInfo(user= User.objects.get(username='ravi'),TargetPrice='56',Priority='Medium',tradingType='Positional Trading',StockName='Arihant capital').save()
-    responseData = {
-            "result":True,
-    }
-    return Response(responseData)
+@api_view(["post"])
+def StocksData(request):
+    data = fetchAllData.StockOperations(
+        request.data["operationType"], request.data["recordDetails"]
+    )
+    return Response({**data, "response": True})
 
 
 

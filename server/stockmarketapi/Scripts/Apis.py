@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+from stockmarketapi.models import StockInfo,User
 
 class Api:
     """
@@ -81,3 +82,41 @@ class Api:
         headers = {}
         response = requests.request("GET", url, headers=headers, data=payload)
         return json.loads(response.text)
+    
+    
+    def StockOperations(type, formData):
+        match type:
+            case "Add":
+                StockInfo(
+                    user=User.objects.get(UserID=formData["userID"]),
+                    TargetPrice=formData["targetPrice"],
+                    Priority=formData["priority"],
+                    tradingType=formData["tradingType"],
+                    StockName=formData["stockName"],
+                ).save()
+                return {"operation": type}
+
+            case "Edit":
+                StockInfo(
+                    user=User.objects.get(UserID=formData["userID"]),
+                    TargetPrice=formData["targetPrice"],
+                    Priority=formData["priority"],
+                    tradingType=formData["tradingType"],
+                    StockName=formData["stockName"],
+                ).save()
+                return {"operation": type}
+
+            case "Delete":
+                try:
+                    getRecordId = User.objects.get(id=formData["id"])
+                except User.DoesNotExist:
+                    raise Http404("record not existed in DataBase")
+
+                getRecordId.delete()
+                return {"operation": type}
+
+            case "Retrive":
+                obj = {}
+                obj["data"] = User.objects.all()
+                return {**obj, "operation": type}
+
