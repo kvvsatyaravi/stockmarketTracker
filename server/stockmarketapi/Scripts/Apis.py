@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from stockmarketapi.models import StockInfo,User
+from rest_framework.response import Response
 
 class Api:
     """
@@ -84,7 +85,8 @@ class Api:
         return json.loads(response.text)
     
     
-    def StockOperations(type, formData):
+    def StockOperations(self, type, formData):
+        print(formData)
         match type:
             case "Add":
                 StockInfo(
@@ -116,7 +118,8 @@ class Api:
                 return {"operation": type}
 
             case "Retrive":
-                obj = {}
-                obj["data"] = User.objects.all()
-                return {**obj, "operation": type}
+                allDataDic = {}
+                usersData = StockInfo.objects.all()
+                allDataDic['data'] = [{'targetPrice': u.TargetPrice, 'Priority': u.Priority,'tradingType':u.tradingType,'StockName':u.StockName,'EditDate':u.EditDate} for u in usersData]
+                return allDataDic
 

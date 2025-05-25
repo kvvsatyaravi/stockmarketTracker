@@ -1,5 +1,4 @@
 from django.db import models
-from datetime import datetime
 
 # Create your models here.
 class User(models.Model):
@@ -12,11 +11,11 @@ class User(models.Model):
 
 class StockInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='UserID')
-    EditDate = models.DateField(default=datetime.now)
+    EditDate = models.DateField(auto_now=True,null=True)
     TargetPrice = models.FloatField()
-    StockName = models.CharField(max_length=50,default='-')
     Priority = models.CharField(max_length=10)
     tradingType = models.CharField(max_length=25,default='-')
+    StockName = models.CharField(max_length=50,default='-')
 
     def __str__(self):
         return f"{self.user.username} - {self.EditDate}"

@@ -148,10 +148,16 @@ def nseStocksData(request):
 
 @api_view(["post"])
 def StocksData(request):
+    startTime = time.time()
     data = fetchAllData.StockOperations(
         request.data["operationType"], request.data["recordDetails"]
     )
-    return Response({**data, "response": True})
+    endTime = time.time()
+    # get the execution time
+    elapsed_time = int(endTime - startTime)
+    elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
+    print(data)
+    return Response({**data, "response": True,"executedTime":elapsed_time})
 
 
 
