@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Modal, Form, Input, Select, Button, Row, Col, Typography } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
-import { useGetApiData, stocksOperations } from "./commonUtils";
+import { useGetApiData, stocksOperations, showToast } from "./commonUtils";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -65,10 +65,12 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
           targetPrice: data.TargetPrice,
           priority: data.Priority,
           tradingType: data.investmentType,
-          stockName: data.name,
+          stockName: stockOptions.find(e => data.name == e.value).label,
         },
+      }).then((e) => {
+        showToast("Successfully added new stock information in database");
+        onClose();
       });
-      onClose();
     });
   };
 

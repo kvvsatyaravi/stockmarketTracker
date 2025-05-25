@@ -2,8 +2,16 @@ import React, { useEffect, useState, useRef } from "react";
 import { Button, Select, Input } from "antd";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import { EditOutlined, DeleteOutlined, PlusOutlined,SearchOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import { stocksOperations } from "./commonUtils";
 import { AddStockModal, DeleteStockModal } from "./StockModels";
+import { ToastContainer } from "react-toastify";
 
 function StocksList() {
   const [StocksData, setStocksData] = useState([]);
@@ -123,90 +131,13 @@ function StocksList() {
   ];
 
   useEffect(() => {
-    fetch('https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/stocksOperations/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-       "userID":1,
-       "targetPrice":123,
-       "priority":"High",
-       "tradingType":"positional Trading",
-       "stockName":"Lancer conatiner line"
-      }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
+    stocksOperations({
+      operationType: "Retrive",
+      recordDetails: "",
+    }).then((e)=>{
+      console.log(e)
+      // const stocksData = e.data
     });
-    // setStocksTableObj({
-    //   "All Stocks": [
-    //     {
-    //       name: "bse",
-    //       "Add/Edit": "12-03-22",
-    //       CurrentPrice: 1234,
-    //       TargetPrice: 4332,
-    //       Priority: "Medium",
-    //       ChangeDiff: 10,
-    //     },
-    //     {
-    //       name: "nse",
-    //       "Add/Edit": "12-03-22",
-    //       CurrentPrice: 1234,
-    //       TargetPrice: 4332,
-    //       Priority: "High",
-    //       ChangeDiff: 10,
-    //     },
-    //     {
-    //       name: "bse",
-    //       "Add/Edit": "12-03-22",
-    //       CurrentPrice: 1234,
-    //       TargetPrice: 4332,
-    //       Priority: "Medium",
-    //       ChangeDiff: 10,
-    //     },
-    //     {
-    //       name: "nse",
-    //       "Add/Edit": "12-03-22",
-    //       CurrentPrice: 1234,
-    //       TargetPrice: 4332,
-    //       Priority: "High",
-    //       ChangeDiff: 10,
-    //     },
-    //   ],
-    //   "Near Targets": [
-    //     {
-    //       name: "bse",
-    //       "Add/Edit": "12-03-22",
-    //       CurrentPrice: 1234,
-    //       TargetPrice: 4332,
-    //       Priority: "Medium",
-    //       ChangeDiff: 10,
-    //     },
-    //     {
-    //       name: "nse",
-    //       "Add/Edit": "12-03-22",
-    //       CurrentPrice: 1234,
-    //       TargetPrice: 4332,
-    //       Priority: "High",
-    //       ChangeDiff: 10,
-    //     },
-    //   ],
-    //   "Far Targets": [
-    //     {
-    //       name: "nse",
-    //       "Add/Edit": "12-03-22",
-    //       CurrentPrice: 1234,
-    //       TargetPrice: 4332,
-    //       Priority: "High",
-    //       ChangeDiff: 10,
-    //     },
-    //   ],
-    // });
   }, []);
 
   const toogleModal = (name, toggle) => {
@@ -246,14 +177,14 @@ function StocksList() {
         </div>
 
         <div style={{ display: "flex", gap: "15px" }}>
+          <Button style={{ background: "rgb(65 101 210)" }} onClick={() => {}}>
+            <ReloadOutlined style={{ color: "white" }} />
+          </Button>
+
           <Button onClick={() => toogleModal("add", true)}>
             <PlusOutlined />
           </Button>
-          <Input
-            placeholder="Search Stocks"
-            prefix={<SearchOutlined />}
-            
-          />
+          <Input placeholder="Search Stocks" prefix={<SearchOutlined />} />
           <DropdownButton
             id="dropdown-shocks-button"
             title="Positional trading"
@@ -314,9 +245,16 @@ function StocksList() {
           </tbody>
         </table>
 
+        <ToastContainer />
         <AddStockModal
           visible={Toggle.add}
-          onClose={() => toogleModal("add", false)}
+          onClose={() => {
+            toogleModal("add", false);
+            stocksOperations({
+              operationType: "Retrive",
+              recordDetails: "",
+            });
+          }}
           type="Add"
         />
         <AddStockModal

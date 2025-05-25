@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import axios from "axios";
-import { Spin } from "antd";
+import { message, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
 
 const Exchanges = React.createContext({});
 const StockmarketContext = Exchanges.Provider;
@@ -22,13 +23,16 @@ const Loader = () => {
 };
 
 const stocksOperations = (body) => {
-  fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/stocksOperations/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
+  return fetch(
+    "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/stocksOperations/",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }
+  )
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -41,6 +45,10 @@ const stocksOperations = (body) => {
     .catch((error) => {
       console.error("Error:", error);
     });
+};
+
+const showToast = (message) => {
+  toast.success(message);
 };
 
 const useGetApiData = ({ url, method, body = null, headers = null }) => {
@@ -68,4 +76,10 @@ const useGetApiData = ({ url, method, body = null, headers = null }) => {
   return { response, error, loading };
 };
 
-export { useGetApiData, StockmarketContext, Loader,stocksOperations };
+export {
+  useGetApiData,
+  StockmarketContext,
+  Loader,
+  stocksOperations,
+  showToast,
+};

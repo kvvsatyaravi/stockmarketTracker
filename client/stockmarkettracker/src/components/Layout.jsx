@@ -30,10 +30,6 @@ function Layout() {
 
   useEffect(() => {
     FetchAllStocksData();
-    stocksOperations({
-      operationType: "Retrive",
-      recordDetails: "",
-    });
   }, []);
 
   return (
