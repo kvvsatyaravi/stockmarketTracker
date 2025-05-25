@@ -21,6 +21,28 @@ const Loader = () => {
   );
 };
 
+const stocksOperations = (body) => {
+  fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/stocksOperations/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((responseData) => {
+      console.log("Success:", responseData);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
+
 const useGetApiData = ({ url, method, body = null, headers = null }) => {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState("");
@@ -46,4 +68,4 @@ const useGetApiData = ({ url, method, body = null, headers = null }) => {
   return { response, error, loading };
 };
 
-export { useGetApiData, StockmarketContext, Loader };
+export { useGetApiData, StockmarketContext, Loader,stocksOperations };

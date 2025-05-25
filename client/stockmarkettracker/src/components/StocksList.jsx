@@ -123,6 +123,26 @@ function StocksList() {
   ];
 
   useEffect(() => {
+    fetch('https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/stocksOperations/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+       "userID":1,
+       "targetPrice":123,
+       "priority":"High",
+       "tradingType":"positional Trading",
+       "stockName":"Lancer conatiner line"
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
     // setStocksTableObj({
     //   "All Stocks": [
     //     {
