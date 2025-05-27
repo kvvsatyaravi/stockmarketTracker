@@ -24,6 +24,7 @@ function Layout() {
       .then((AllStocksData) => {
         var filteredData = [];
         console.log(AllStocksData);
+        setExchangeData(AllStocksData)
       })
       .catch((error) => console.error(error));
   }

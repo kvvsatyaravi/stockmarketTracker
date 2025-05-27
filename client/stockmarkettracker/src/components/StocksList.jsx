@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef,useMemo, useContext } from "react";
 import { Button, Select, Input } from "antd";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
@@ -9,93 +9,36 @@ import {
   SearchOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
-import { stocksOperations } from "./commonUtils";
+import { stocksOperations,Exchanges } from "./commonUtils";
 import { AddStockModal, DeleteStockModal } from "./StockModels";
 import { ToastContainer } from "react-toastify";
 
 function StocksList() {
+  const {exchangeData} = useContext(Exchanges)
   const [StocksData, setStocksData] = useState([]);
+   const [stocksTableObj, setStocksTableObj] = useState({
+      "All Stocks": [],
+      "Near Targets": [],
+      "Far Targets": [],
+    });
+    const [activeTab, setActiveTab] = useState("All Stocks");
   const [Toggle, setToggle] = useState({
     add: false,
     delete: false,
     edit: false,
   });
-  const [stocksTableObj, setStocksTableObj] = useState({
-    "All Stocks": [
-      {
-        name: "bse",
-        "Add/Edit": "12-03-22",
-        CurrentPrice: 1234,
-        TargetPrice: 4332,
-        Priority: "Medium",
-        ChangeDiff: 10,
-      },
-      {
-        name: "nse",
-        "Add/Edit": "12-03-22",
-        CurrentPrice: 1234,
-        TargetPrice: 4332,
-        Priority: "High",
-        ChangeDiff: 10,
-      },
-      {
-        name: "bse",
-        "Add/Edit": "12-03-22",
-        CurrentPrice: 1234,
-        TargetPrice: 4332,
-        Priority: "Medium",
-        ChangeDiff: 10,
-      },
-      {
-        name: "nse",
-        "Add/Edit": "12-03-22",
-        CurrentPrice: 1234,
-        TargetPrice: 4332,
-        Priority: "High",
-        ChangeDiff: 10,
-      },
-    ],
-    "Near Targets": [
-      {
-        name: "bse",
-        "Add/Edit": "12-03-22",
-        CurrentPrice: 1234,
-        TargetPrice: 4332,
-        Priority: "Medium",
-        ChangeDiff: 10,
-      },
-      {
-        name: "nse",
-        "Add/Edit": "12-03-22",
-        CurrentPrice: 1234,
-        TargetPrice: 4332,
-        Priority: "High",
-        ChangeDiff: 10,
-      },
-    ],
-    "Far Targets": [
-      {
-        name: "nse",
-        "Add/Edit": "12-03-22",
-        CurrentPrice: 1234,
-        TargetPrice: 4332,
-        Priority: "High",
-        ChangeDiff: 10,
-      },
-    ],
-  });
-  const [activeTab, setActiveTab] = useState("All Stocks");
   const selStock = useRef({});
+  const [ExchangesData, setExchangeData] = useState([]);
 
-  const stocksTableDefinition = [
+const stocksTableDefinition = [
     {
-      field: "name",
-      Label: "Name",
+      field: "StockName",
+      Label: "name",
       width: "15%",
     },
     {
       Label: "Add/Edit",
-      field: "Add/Edit",
+      field: "EditDate",
       width: "15%",
     },
     {
@@ -104,7 +47,7 @@ function StocksList() {
       width: "15%",
     },
     {
-      field: "TargetPrice",
+      field: "targetPrice",
       Label: "Target Price",
       width: "15%",
     },
@@ -114,31 +57,120 @@ function StocksList() {
       width: "15%",
     },
     {
-      field: "ChangeDiff",
       Label: "Change Difference",
+      field: "ChangeDiff",
       width: "15%",
     },
     {
-      Label: "Modify",
-      format: "edit",
-      width: "5%",
+      field: "edit",
+      Label: "Edit",
+      width: "7.5%",
     },
     {
+      field: "delete",
       Label: "Delete",
-      format: "delete",
-      width: "5%",
+      width: "7.5%",
     },
   ];
 
-  useEffect(() => {
+  const getStocksInfo = () => {
     stocksOperations({
       operationType: "Retrive",
       recordDetails: "",
-    }).then((e)=>{
-      console.log(e)
-      // const stocksData = e.data
+    }).then(async (result) => {
+      console.log(result);
+      var data = [];
+      var exchangesData = ExchangesData;
+      for (let i = 0; i < result.data.length; i++) {
+        var details = result.data[i];
+        if (
+          exchangesData[0].nse.data[details["StockName"]] ||
+          exchangesData[1].bse.data[details["StockName"]]
+        ) {
+          var data =
+            exchangesData[0].nse.data[details["StockName"]] ||
+            exchangesData[1].bse.data[details["StockName"]];
+          data.push({
+            id: details.id,
+            StockName: data.Name,
+            EditDate: details.EditName,
+            CurrentPrice: data.LTP,
+            targetPrice: details.targetPrice,
+            Priority: details.Priority,
+            ChangeDiff: (
+              parseFloat(details.targetPrice) - parseFloat(data.LTP)
+            ).toFixed(2),
+          });
+        } else {
+          var bseStocksFilter = Object.keys(exchangesData[1].bse.data).filter(
+            (e) => details["StockName"].includes(e)
+          );
+          var nseStocksFilter = Object.keys(exchangesData[0].nse.data).filter(
+            (e) => details["StockName"].includes(e)
+          );
+
+          if (bseStocksFilter.length || nseStocksFilter.length) {
+            var stockKey = bseStocksFilter[0] || nseStocksFilter[0];
+            var stockInfo =
+              exchangesData[0].nse.data[stockKey] ||
+              exchangesData[1].bse.data[stockKey];
+            data.push({
+              id: details.id,
+              StockName: stockInfo.Name,
+              EditDate: details.EditName,
+              CurrentPrice: stockInfo.LTP,
+              targetPrice: details.targetPrice,
+              Priority: details.Priority,
+              ChangeDiff: (
+                parseFloat(details.targetPrice) - parseFloat(stockInfo.LTP)
+              ).toFixed(2),
+            });
+          } else {
+            var stockUrl = await fetch(
+              "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/searchSuggestion?fundName=" +
+                details["StockName"] +
+                "&type=1"
+            );
+            stockUrl = await stockUrl.json();
+            var response = await fetch(
+              "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getStockLivePrice/?stockUrl=" +
+                stockUrl.data[0].link_src
+            );
+            var stockData = await response.json();
+            var price;
+            if (stockData.data) {
+              price =
+                stockData.data.bseprice == "-"
+                  ? stockData.data.nsePrice
+                  : stockData.data.bsePrice;
+            }
+            data.push({
+              id: details.id,
+              StockName: stockUrl.data[0].name,
+              EditDate: details.EditDate,
+              CurrentPrice: price,
+              targetPrice: details.targetPrice,
+              Priority: details.Priority,
+              ChangeDiff: (
+                parseFloat(details.targetPrice) - parseFloat(price)
+              ).toFixed(2),
+            });
+          }
+        }
+      }
+
+      setStocksTableObj({
+        "All Stocks": data,
+        "Near Targets": [],
+        "Far Targets": [],
+      });
     });
-  }, []);
+  };
+
+    useMemo(() => {
+      if(exchangeData && exchangeData.length)
+       getStocksInfo();
+    }, [exchangeData]);
 
   const toogleModal = (name, toggle) => {
     setToggle((prev) => {
@@ -148,14 +180,6 @@ function StocksList() {
     });
   };
 
-  const handleChange = (value) => {
-    console.log(value); // { value: "lucy", key: "lucy", label: "Lucy (101)" }
-  };
-
-  const requestOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
 
   return (
     <>
@@ -171,7 +195,9 @@ function StocksList() {
               }}
             >
               <b>{eachTab}</b>
-              <b className="stocks-tabs-number">{15}</b>
+              <b className="stocks-tabs-number">
+                {stocksTableObj[eachTab].length}
+              </b>
             </div>
           ))}
         </div>
@@ -199,74 +225,87 @@ function StocksList() {
         <table class="table table-bordered table-hover bg-white" border={0}>
           <thead class="table-light">
             <tr>
-              {stocksTableDefinition.map((e) => (
-                <>
-                  <th className="text-center" style={{ width: e.width }}>
-                    {e.Label}
-                  </th>
-                </>
-              ))}
+               {stocksTableObj[activeTab].length
+                ? stocksTableDefinition.map((e) => (
+                    <>
+                      <th style={{ width: e.width }}>{e.Label}</th>
+                    </>
+                  ))
+                : ""}
             </tr>
           </thead>
           <tbody>
-            {stocksTableObj[activeTab].map((eachStock) => (
-              <tr>
-                {stocksTableDefinition.map((e) =>
-                  e.format ? (
-                    e.format == "edit" ? (
-                      <>
-                        <td
-                          className="text-center"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => toogleModal("edit", true)}
-                        >
-                          <EditOutlined />
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td
-                          className="text-center"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => toogleModal("delete", true)}
-                        >
-                          <DeleteOutlined />
-                        </td>
-                      </>
-                    )
-                  ) : (
-                    <>
-                      <td className="text-center">{eachStock[e.field]}</td>
-                    </>
-                  )
-                )}
-              </tr>
-            ))}
+            {stocksTableObj[activeTab].length
+              ? stocksTableObj[activeTab].map((eachStock) => (
+                  <tr>
+                    {stocksTableDefinition.map((e) => {
+                      if (e.field == "edit") {
+                        return (
+                          <Button
+                            type="primary"
+                            onClick={() => {
+                              selStock.current = eachStock;
+                              toogleModal("edit", true);
+                            }}
+                          >
+                            Edit stock
+                          </Button>
+                        );
+                      } else if (e.field == "delete") {
+                        return (
+                          <Button
+                            type="primary"
+                            onClick={() => {
+                              selStock.current = eachStock;
+                              toogleModal("delete", true);
+                            }}
+                          >
+                            delete stock
+                          </Button>
+                        );
+                      } else {
+                        return <td>{eachStock[e.field]}</td>;
+                      }
+                    })}
+                  </tr>
+                ))
+              : ""}
           </tbody>
         </table>
 
         <ToastContainer />
-        <AddStockModal
-          visible={Toggle.add}
-          onClose={() => {
-            toogleModal("add", false);
-            stocksOperations({
-              operationType: "Retrive",
-              recordDetails: "",
-            });
-          }}
-          type="Add"
-        />
-        <AddStockModal
-          visible={Toggle.edit}
-          selStock={selStock.current}
-          onClose={() => toogleModal("edit", false)}
-          type="Edit"
-        />
-        <DeleteStockModal
-          visible={Toggle.delete}
-          onClose={() => toogleModal("delete", false)}
-        />
+        {Toggle.add && (
+          <AddStockModal
+            visible={Toggle.add}
+            onClose={() => {
+              toogleModal("add", false);
+              setTimeout(() => {
+                getStocksInfo();
+              }, 1000);
+            }}
+            type="Add"
+          />
+        )}
+        {Toggle.edit && (
+          <AddStockModal
+            visible={Toggle.edit}
+            selStock={selStock.current}
+            onClose={() => toogleModal("edit", false)}
+            type="Edit"
+          />
+        )}
+        {Toggle.delete && (
+          <DeleteStockModal
+            selStock={selStock.current}
+            visible={Toggle.delete}
+            onClose={() => {
+              toogleModal("delete", false);
+              setTimeout(() => {
+                getStocksInfo();
+              }, 1000);
+            }}
+          />
+        )}
       </div>
     </>
   );

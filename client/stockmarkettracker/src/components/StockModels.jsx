@@ -10,7 +10,7 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
   const [form] = Form.useForm();
   const [livePrice, setLivePrice] = useState(0);
   const [stockOptions, setStockOptions] = useState([]);
-  const [searchValue, SetSearchValue] = useState("");
+  const [searchValue, SetSearchValue] = useState(" ");
   const [selStockApiUrl, setSelStockApiUrl] = useState("");
   const [intiVal, setIntiVal] = useState({});
 
@@ -24,7 +24,11 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
 
   useEffect(() => {
     console.log(response);
-    if (response) {
+    if (
+      response &&
+      response.data.length &&
+      response.data[0].pdt_dis_nm != "No Result Available"
+    ) {
       var searchResponseData = response.data.map((eachFund) => {
         return {
           label: eachFund.name,
@@ -39,7 +43,6 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
     if (selStock)
       setIntiVal({
         name: selStock.name,
-        currentPrice: selStock.CurrentPrice,
         TargetPrice: selStock.TargetPrice,
         Priority: selStock.Priority,
         investmentType: "Positional",
@@ -65,12 +68,12 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
           targetPrice: data.TargetPrice,
           priority: data.Priority,
           tradingType: data.investmentType,
-          stockName: stockOptions.find(e => data.name == e.value).label,
+          stockName: stockOptions.find((e) => data.name == e.value)?.label
+            ? stockOptions.find((e) => data.name == e.value)?.label
+            : "-",
         },
-      }).then((e) => {
-        showToast("Successfully added new stock information in database");
-        onClose();
       });
+      onClose();
     });
   };
 
@@ -105,14 +108,14 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
         initialValues={intiVal}
       >
         <Form.Item name="name" label="Stock Name" rules={[{ required: true }]}>
-          {/* <Input className="col-6" /> */}
           {type == "Add" ? (
             <Select
               showSearch
               filterOption={false}
               onKeyUp={(evt) => {
-                console.log(evt.target.value);
-                SetSearchValue(evt.target.value);
+                setTimeout(() => {
+                  SetSearchValue(evt.target.value);
+                }, 1000);
               }}
               onSelect={(evt) => {
                 getStockLivePrice(evt);
@@ -130,7 +133,7 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
           )}
         </Form.Item>
 
-        <Form.Item label="Live Price" name="currentPrice">
+        <Form.Item label="Live Price">
           <Row align="middle" gutter={8}>
             <Col className="col-3">{type == "Add" ? livePrice : ""}</Col>
             <Col style={{ background: "lightgrey", borderRadius: "10px" }}>
@@ -170,14 +173,14 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
         <div className="d-flex justify-content-end gap-2 mt-3">
           <Button
             style={{ background: "#ff924c", color: "white", border: "none" }}
-            onClick={handleReset}
+            onClick={(e) => handleReset(e)}
           >
             Reset
           </Button>
           <Button
             type="primary"
             style={{ background: "#091A52" }}
-            onClick={handleSubmit}
+            onClick={(e) => handleSubmit(e)}
           >
             Submit
           </Button>
@@ -187,7 +190,7 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
   );
 };
 
-const DeleteStockModal = ({ visible, onClose }) => {
+const DeleteStockModal = ({ visible, onClose, selStock }) => {
   return (
     <Modal
       open={visible}
@@ -201,11 +204,21 @@ const DeleteStockModal = ({ visible, onClose }) => {
           className="col-2"
           type="primary"
           style={{ background: "#091A52" }}
+          onClick={(e) => {
+            stocksOperations({
+              operationType: "Delete",
+              recordDetails: {
+                id: selStock.id,
+              },
+            });
+            onClose();
+          }}
         >
           Yes
         </Button>
         <Button
           className="col-2"
+          onClick={() => onClose()}
           style={{ background: "#ff924c", color: "white", border: "none" }}
         >
           No
@@ -214,4 +227,5 @@ const DeleteStockModal = ({ visible, onClose }) => {
     </Modal>
   );
 };
+
 export { AddStockModal, DeleteStockModal };

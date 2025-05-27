@@ -79,6 +79,7 @@ const useGetApiData = ({ url, method, body = null, headers = null }) => {
 export {
   useGetApiData,
   StockmarketContext,
+  Exchanges,
   Loader,
   stocksOperations,
   showToast,
