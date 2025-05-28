@@ -77,7 +77,7 @@ function StocksList() {
       recordDetails: "",
     }).then(async (result) => {
       console.log(result);
-      var data = [];
+      var dataArr = [];
       var exchangesData = exchangeData;
       for (let i = 0; i < result.data.length; i++) {
         var details = result.data[i];
@@ -88,10 +88,10 @@ function StocksList() {
           var data =
             exchangesData[0].nse.data[details["StockName"]] ||
             exchangesData[1].bse.data[details["StockName"]];
-          data.push({
+          dataArr.push({
             id: details.id,
             StockName: data.Name,
-            EditDate: details.EditName,
+            EditDate: details.EditDate,
             CurrentPrice: data.LTP,
             targetPrice: details.targetPrice,
             Priority: details.Priority,
@@ -112,10 +112,10 @@ function StocksList() {
             var stockInfo =
               exchangesData[0].nse.data[stockKey] ||
               exchangesData[1].bse.data[stockKey];
-            data.push({
+            dataArr.push({
               id: details.id,
               StockName: stockInfo.Name,
-              EditDate: details.EditName,
+              EditDate: details.EditDate,
               CurrentPrice: stockInfo.LTP,
               targetPrice: details.targetPrice,
               Priority: details.Priority,
@@ -137,7 +137,7 @@ function StocksList() {
                   ? response.data.nsePrice
                   : response.data.bsePrice;
             }
-            data.push({
+            dataArr.push({
               id: details.id,
               StockName: details["StockName"],
               EditDate: details.EditDate,
@@ -153,7 +153,7 @@ function StocksList() {
       }
 
       setStocksTableObj({
-        "All Stocks": data,
+        "All Stocks": dataArr,
         "Near Targets": [],
         "Far Targets": [],
       });

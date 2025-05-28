@@ -72,8 +72,10 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
             ? stockOptions.find((e) => data.name == e.value)?.label
             : "-",
         },
+      }).then((e) => {
+        showToast("Successfully added new stock information in database");
+        onClose();
       });
-      onClose();
     });
   };
 
@@ -210,8 +212,12 @@ const DeleteStockModal = ({ visible, onClose, selStock }) => {
               recordDetails: {
                 id: selStock.id,
               },
+            }).then((e) => {
+              showToast(
+                "Successfully deleted selected stock information from database"
+              );
+              onClose();
             });
-            onClose();
           }}
         >
           Yes
