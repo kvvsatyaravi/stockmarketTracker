@@ -41,6 +41,7 @@ const stocksOperations = (body) => {
     })
     .then((responseData) => {
       console.log("Success:", responseData);
+      return responseData
     })
     .catch((error) => {
       console.error("Error:", error);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef,useMemo, useContext } from "react";
+import React, { useEffect, useState, useRef, useMemo, useContext } from "react";
 import { Button, Select, Input } from "antd";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
@@ -9,28 +9,26 @@ import {
   SearchOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
-import { stocksOperations,Exchanges } from "./commonUtils";
+import { stocksOperations, Exchanges } from "./commonUtils";
 import { AddStockModal, DeleteStockModal } from "./StockModels";
 import { ToastContainer } from "react-toastify";
 
 function StocksList() {
-  const {exchangeData} = useContext(Exchanges)
-  const [StocksData, setStocksData] = useState([]);
-   const [stocksTableObj, setStocksTableObj] = useState({
-      "All Stocks": [],
-      "Near Targets": [],
-      "Far Targets": [],
-    });
-    const [activeTab, setActiveTab] = useState("All Stocks");
+  const [exchangeData] = useContext(Exchanges);
+  const [stocksTableObj, setStocksTableObj] = useState({
+    "All Stocks": [],
+    "Near Targets": [],
+    "Far Targets": [],
+  });
+  const [activeTab, setActiveTab] = useState("All Stocks");
   const [Toggle, setToggle] = useState({
     add: false,
     delete: false,
     edit: false,
   });
   const selStock = useRef({});
-  const [ExchangesData, setExchangeData] = useState([]);
 
-const stocksTableDefinition = [
+  const stocksTableDefinition = [
     {
       field: "StockName",
       Label: "name",
@@ -49,12 +47,12 @@ const stocksTableDefinition = [
     {
       field: "targetPrice",
       Label: "Target Price",
-      width: "15%",
+      width: "10%",
     },
     {
       field: "Priority",
       Label: "Priority",
-      width: "15%",
+      width: "10%",
     },
     {
       Label: "Change Difference",
@@ -62,14 +60,14 @@ const stocksTableDefinition = [
       width: "15%",
     },
     {
-      field: "edit",
+      format: "edit",
       Label: "Edit",
-      width: "7.5%",
+      width: "12%",
     },
     {
-      field: "delete",
+      format: "delete",
       Label: "Delete",
-      width: "7.5%",
+      width: "15%",
     },
   ];
 
@@ -80,7 +78,7 @@ const stocksTableDefinition = [
     }).then(async (result) => {
       console.log(result);
       var data = [];
-      var exchangesData = ExchangesData;
+      var exchangesData = exchangeData;
       for (let i = 0; i < result.data.length; i++) {
         var details = result.data[i];
         if (
@@ -126,7 +124,7 @@ const stocksTableDefinition = [
               ).toFixed(2),
             });
           } else {
-   var response = await fetch(
+            var response = await fetch(
               "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/singleStockInfo/?fundName=" +
                 details["StockName"]
             );
@@ -162,10 +160,9 @@ const stocksTableDefinition = [
     });
   };
 
-    useMemo(() => {
-      if(exchangeData && exchangeData.length)
-       getStocksInfo();
-    }, [exchangeData]);
+  useMemo(() => {
+    if (exchangeData && exchangeData.length) getStocksInfo();
+  }, [exchangeData]);
 
   const toogleModal = (name, toggle) => {
     setToggle((prev) => {
@@ -174,7 +171,6 @@ const stocksTableDefinition = [
       return initialValues;
     });
   };
-
 
   return (
     <>
@@ -219,8 +215,8 @@ const stocksTableDefinition = [
       <div style={{ height: "80%", overflow: "auto" }}>
         <table class="table table-bordered table-hover bg-white" border={0}>
           <thead class="table-light">
-            <tr>
-               {stocksTableObj[activeTab].length
+            <tr className="text-center">
+              {stocksTableObj[activeTab].length
                 ? stocksTableDefinition.map((e) => (
                     <>
                       <th style={{ width: e.width }}>{e.Label}</th>
@@ -233,35 +229,40 @@ const stocksTableDefinition = [
             {stocksTableObj[activeTab].length
               ? stocksTableObj[activeTab].map((eachStock) => (
                   <tr>
-                    {stocksTableDefinition.map((e) => {
-                      if (e.field == "edit") {
-                        return (
-                          <Button
-                            type="primary"
-                            onClick={() => {
-                              selStock.current = eachStock;
-                              toogleModal("edit", true);
-                            }}
-                          >
-                            Edit stock
-                          </Button>
-                        );
-                      } else if (e.field == "delete") {
-                        return (
-                          <Button
-                            type="primary"
-                            onClick={() => {
-                              selStock.current = eachStock;
-                              toogleModal("delete", true);
-                            }}
-                          >
-                            delete stock
-                          </Button>
-                        );
-                      } else {
-                        return <td>{eachStock[e.field]}</td>;
-                      }
-                    })}
+                    {stocksTableDefinition.map((e) =>
+                      e.format ? (
+                        e.format == "edit" ? (
+                          <>
+                            <td className="text-center"
+                              type="primary"
+                              onClick={() => {
+                                selStock.current = eachStock;
+                                toogleModal("edit", true);
+                              }}
+                            >
+                              <EditOutlined />
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td
+                              className="text-center"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => {
+                                selStock.current = eachStock;
+                                toogleModal("delete", true);
+                              }}
+                            >
+                              <DeleteOutlined />
+                            </td>
+                          </>
+                        )
+                      ) : (
+                        <>
+                          <td className="text-center">{eachStock[e.field]}</td>
+                        </>
+                      )
+                    )}
                   </tr>
                 ))
               : ""}
