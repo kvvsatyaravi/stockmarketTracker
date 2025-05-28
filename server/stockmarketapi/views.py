@@ -49,43 +49,24 @@ def getMutualFundSuggestions(request):
 
 @api_view(['GET'])
 def getStockLivePrice(request):
-    startTime = time.time()
     url = request.query_params['stockUrl']
-    html_parser = "html.parser"
-    nsePrice = '-'
-    bsePrice = '-'
-
-    try:
-        soup = BeautifulSoup(requests.get(url, timeout=60).text, html_parser)
-        bsePrice = soup.select("div.inprice1.bsecp")
-        bsePrice = bsePrice[0].get_text()
-        nsePrice = soup.select("div.inprice1.nsecp")
-        nsePrice = nsePrice[0].get_text()
-
-    except IndexError:
-        if soup.select("div#sp_low"):
-            nsePrice = soup.select("div#sp_low")[0].get_text()
-            bsePrice = soup.select("div#sp_low")[0].get_text()
-        else:
-            nsePrice = soup.select("div.nsestkcp.bsestkcp")[0].get_text()
-            bsePrice = soup.select("div.nsestkcp.bsestkcp")[0].get_text()
-
-    finally:
-        endTime = time.time()
-        # get the execution time
-        elapsed_time = int(endTime - startTime)
-        elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
-
-        responseData = {
-            "nsePrice":nsePrice,
-            "bsePrice":bsePrice,
-            "executedTime":elapsed_time
-        }
-        
-        return Response({
-        'response':"true",
+    responseData = fetchAllData.getStockInfo(url)
+    return Response({
+        'response':True,
         'data':responseData
-        })
+    })
+        
+@api_view(['GET'])
+def getSingleStockData(request):
+    searchUrl = "https://www.moneycontrol.com/mccode/common/autosuggestion_solr.php?classic=true&query="+request.query_params['fundName']+"&type=1&format=json&main=true"
+    Data = fetchAllData.getSearchSuggestions(searchUrl)
+    # link = Data[0]["data"][0]
+    # link = link["link_src"]
+    # responseData = fetchAllData.getStockInfo(Data["data"][0])
+    return Response({
+        'response':True,
+        'data':Data[0]
+    })
 
 @api_view(["Get"])
 def getFundPerformanceData(request):
@@ -148,16 +129,8 @@ def nseStocksData(request):
 
 @api_view(["post"])
 def StocksData(request):
-    startTime = time.time()
     data = fetchAllData.StockOperations(
         request.data["operationType"], request.data["recordDetails"]
     )
-    endTime = time.time()
-    # get the execution time
-    elapsed_time = int(endTime - startTime)
-    elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
     print(data)
-    return Response({**data, "response": True,"executedTime":elapsed_time})
-
-
-
+    return Response({**data, "response": True})

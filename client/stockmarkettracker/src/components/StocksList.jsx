@@ -126,27 +126,22 @@ const stocksTableDefinition = [
               ).toFixed(2),
             });
           } else {
-            var stockUrl = await fetch(
-              "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/searchSuggestion?fundName=" +
-                details["StockName"] +
-                "&type=1"
+   var response = await fetch(
+              "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/singleStockInfo/?fundName=" +
+                details["StockName"]
             );
-            stockUrl = await stockUrl.json();
-            var response = await fetch(
-              "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getStockLivePrice/?stockUrl=" +
-                stockUrl.data[0].link_src
-            );
-            var stockData = await response.json();
+            response = await response.json();
+
             var price;
-            if (stockData.data) {
+            if (response.data) {
               price =
-                stockData.data.bseprice == "-"
-                  ? stockData.data.nsePrice
-                  : stockData.data.bsePrice;
+                response.data.bseprice == "-"
+                  ? response.data.nsePrice
+                  : response.data.bsePrice;
             }
             data.push({
               id: details.id,
-              StockName: stockUrl.data[0].name,
+              StockName: details["StockName"],
               EditDate: details.EditDate,
               CurrentPrice: price,
               targetPrice: details.targetPrice,

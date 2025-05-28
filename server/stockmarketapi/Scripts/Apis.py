@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 from stockmarketapi.models import StockInfo,User
 from rest_framework.response import Response
+from django.http import Http404
 
 class Api:
     """
@@ -83,6 +84,39 @@ class Api:
         headers = {}
         response = requests.request("GET", url, headers=headers, data=payload)
         return json.loads(response.text)
+        
+    def getStockInfo(self, url):
+        startTime = time.time()
+        html_parser = "html.parser"
+        nsePrice = '-'
+        bsePrice = '-'
+    
+        try:
+            soup = BeautifulSoup(requests.get(url, timeout=60).text, html_parser)
+            bsePrice = soup.select("div.inprice1.bsecp")
+            bsePrice = bsePrice[0].get_text()
+            nsePrice = soup.select("div.inprice1.nsecp")
+            nsePrice = nsePrice[0].get_text()
+    
+        except IndexError:
+            if soup.select("div#sp_low"):
+                nsePrice = soup.select("div#sp_low")[0].get_text()
+                bsePrice = soup.select("div#sp_low")[0].get_text()
+            else:
+                nsePrice = soup.select("div.nsestkcp.bsestkcp")[0].get_text()
+                bsePrice = soup.select("div.nsestkcp.bsestkcp")[0].get_text()
+    
+        finally:
+            endTime = time.time()
+            # get the execution time
+            elapsed_time = int(endTime - startTime)
+            elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
+    
+            return {
+                    "nsePrice":nsePrice,
+                    "bsePrice":bsePrice,
+                    "executedTime":elapsed_time
+                }
     
     
     def StockOperations(self, type, formData):
@@ -110,8 +144,8 @@ class Api:
 
             case "Delete":
                 try:
-                    getRecordId = User.objects.get(id=formData["id"])
-                except User.DoesNotExist:
+                    getRecordId = StockInfo.objects.get(id=formData["id"])
+                except StockInfo.DoesNotExist:
                     raise Http404("record not existed in DataBase")
 
                 getRecordId.delete()
@@ -120,6 +154,6 @@ class Api:
             case "Retrive":
                 allDataDic = {}
                 usersData = StockInfo.objects.all()
-                allDataDic['data'] = [{'targetPrice': u.TargetPrice, 'Priority': u.Priority,'tradingType':u.tradingType,'StockName':u.StockName,'EditDate':u.EditDate} for u in usersData]
+                allDataDic['data'] = [{'id':u.id,'targetPrice': u.TargetPrice, 'Priority': u.Priority,'tradingType':u.tradingType,'StockName':u.StockName,'EditDate':u.EditDate} for u in usersData]
                 return allDataDic
 

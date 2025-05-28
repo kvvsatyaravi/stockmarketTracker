@@ -9,4 +9,5 @@ urlpatterns = [
     path('searchSuggestion',views.getSearchSuggerstions,name='searchSuggestion'),
     path('getStockLivePrice/',views.getStockLivePrice,name='stockLivePrice'),
     path('stocksOperations/',views.StocksData,name='stocksOperations'),
+    path('singleStockInfo/',views.getSingleStockData,name='singleStockInfo')
 ]
