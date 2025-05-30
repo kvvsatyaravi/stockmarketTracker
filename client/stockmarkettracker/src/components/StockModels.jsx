@@ -6,7 +6,7 @@ import { useGetApiData, stocksOperations, showToast } from "./commonUtils";
 const { Option } = Select;
 const { Title } = Typography;
 
-const AddStockModal = ({ visible, onClose, type, selStock }) => {
+const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
   const [form] = Form.useForm();
   const [livePrice, setLivePrice] = useState(0);
   const [stockOptions, setStockOptions] = useState([]);
@@ -40,13 +40,15 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
   }, [response]);
 
   useMemo(() => {
-    if (selStock)
+    if (selStock) {
+      setLivePrice(selStock.CurrentPrice);
       setIntiVal({
-        name: selStock.name,
-        TargetPrice: selStock.TargetPrice,
+        name: selStock.StockName,
+        TargetPrice: selStock.targetPrice,
         Priority: selStock.Priority,
         investmentType: "Positional",
       });
+    }
   }, [selStock]);
 
   const handleReset = () => {
@@ -61,21 +63,55 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
         livePrice,
       };
       console.log("Submitted:", data);
-      stocksOperations({
-        operationType: "Add",
-        recordDetails: {
-          userID: 1,
-          targetPrice: data.TargetPrice,
-          priority: data.Priority,
-          tradingType: data.investmentType,
-          stockName: stockOptions.find((e) => data.name == e.value)?.label
-            ? stockOptions.find((e) => data.name == e.value)?.label
-            : "-",
-        },
-      }).then((e) => {
-        showToast("Successfully added new stock information in database");
-        onClose();
-      });
+      if (type == "Add") {
+        var stockName = stockOptions.find((e) => data.name == e.value)?.label
+          ? stockOptions.find((e) => data.name == e.value)?.label
+          : "-";
+        var recordExist = allStocksData.some(
+          (eachStock) => eachStock["StockName"] == stockName
+        );
+        if (!recordExist) {
+          stocksOperations({
+            operationType: "Add",
+            recordDetails: {
+              userID: 1,
+              targetPrice: data.TargetPrice,
+              priority: data.Priority,
+              tradingType: data.investmentType,
+              stockName: stockName,
+            },
+          }).then((e) =>
+            showToast("Successfully added new stock information in database")
+          );
+        } else {
+          showToast(
+            "Successfully added new stock information in database",
+            "error"
+          );
+        }
+      } else {
+        stocksOperations({
+          operationType: "Edit",
+          recordDetails: {
+            userID: 1,
+            recordID: selStock.id,
+            targetPrice: data.TargetPrice,
+            priority: data.Priority,
+            tradingType: data.investmentType,
+            stockName: data.name,
+          },
+        })
+          .then((e) => {
+            showToast("Successfully added updated stock information");
+          })
+          .catch((e) => {
+            showToast(
+              "Some error there or record not found in database",
+              "error"
+            );
+          });
+      }
+      onClose();
     });
   };
 
@@ -105,11 +141,16 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
     >
       <Form
         form={form}
+        onFinish={(e) => handleSubmit(e)}
         layout="horizontal"
         labelCol={{ span: 6 }}
         initialValues={intiVal}
       >
-        <Form.Item name="name" label="Stock Name" rules={[{ required: true }]}>
+        <Form.Item
+          name="name"
+          label="Stock Name"
+          rules={[{ required: true, message: "Please select stock" }]}
+        >
           {type == "Add" ? (
             <Select
               showSearch
@@ -137,11 +178,27 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
 
         <Form.Item label="Live Price">
           <Row align="middle" gutter={8}>
-            <Col className="col-3">{type == "Add" ? livePrice : ""}</Col>
+            <Col className="col-3">{livePrice}</Col>
             <Col style={{ background: "lightgrey", borderRadius: "10px" }}>
               <ReloadOutlined
-                onClick={() => {
-                  getStockLivePrice(selStockApiUrl);
+                onClick={async () => {
+                  if (selStockApiUrl) getStockLivePrice(selStockApiUrl);
+                  else {
+                    var response = await fetch(
+                      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/singleStockInfo/?fundName=" +
+                        selStock.StockName
+                    );
+                    response = await response.json();
+
+                    var price;
+                    if (response.data) {
+                      price =
+                        response.data.bseprice == "-"
+                          ? response.data.nsePrice
+                          : response.data.bsePrice;
+                      setLivePrice(price);
+                    }
+                  }
                 }}
                 style={{ color: "#fa8c16", cursor: "pointer" }}
               />
@@ -152,12 +209,16 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
         <Form.Item
           name="TargetPrice"
           label="Target Price"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: "Please select Target price" }]}
         >
           <Input type="number" className="col-3" />
         </Form.Item>
 
-        <Form.Item name="Priority" label="Priority Level">
+        <Form.Item
+          name="Priority"
+          label="Priority Level"
+          rules={[{ required: true, message: "Please select priority" }]}
+        >
           <Select style={{ width: 120 }}>
             <Option value="High">High</Option>
             <Option value="Medium">Medium</Option>
@@ -165,7 +226,11 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
           </Select>
         </Form.Item>
 
-        <Form.Item name="investmentType" label="Investment Type">
+        <Form.Item
+          name="investmentType"
+          label="Investment Type"
+          rules={[{ required: true, message: "Please select investment type" }]}
+        >
           <Select style={{ width: 120 }}>
             <Option value="Positional">Positional</Option>
             <Option value="Intraday">Intraday</Option>
@@ -180,9 +245,9 @@ const AddStockModal = ({ visible, onClose, type, selStock }) => {
             Reset
           </Button>
           <Button
+            htmlType="submit"
             type="primary"
             style={{ background: "#091A52" }}
-            onClick={(e) => handleSubmit(e)}
           >
             Submit
           </Button>
@@ -212,12 +277,20 @@ const DeleteStockModal = ({ visible, onClose, selStock }) => {
               recordDetails: {
                 id: selStock.id,
               },
-            }).then((e) => {
-              showToast(
-                "Successfully deleted selected stock information from database"
-              );
-              onClose();
-            });
+            })
+              .then((e) => {
+                showToast(
+                  "Successfully deleted stock information from database"
+                );
+                onClose();
+              })
+              .catch((e) => {
+                onClose();
+                showToast(
+                  "Some error or record not found in database",
+                  "error"
+                );
+              });
           }}
         >
           Yes

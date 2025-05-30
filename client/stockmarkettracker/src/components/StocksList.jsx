@@ -90,7 +90,7 @@ function StocksList() {
             exchangesData[1].bse.data[details["StockName"]];
           dataArr.push({
             id: details.id,
-            StockName: data.Name,
+            StockName: details["StockName"],
             EditDate: details.EditDate,
             CurrentPrice: data.LTP,
             targetPrice: details.targetPrice,
@@ -114,7 +114,7 @@ function StocksList() {
               exchangesData[1].bse.data[stockKey];
             dataArr.push({
               id: details.id,
-              StockName: stockInfo.Name,
+              StockName: details["StockName"],
               EditDate: details.EditDate,
               CurrentPrice: stockInfo.LTP,
               targetPrice: details.targetPrice,
@@ -272,6 +272,7 @@ function StocksList() {
         <ToastContainer />
         {Toggle.add && (
           <AddStockModal
+          allStocksData={stocksTableObj["All Stocks"]}
             visible={Toggle.add}
             onClose={() => {
               toogleModal("add", false);
@@ -286,7 +287,12 @@ function StocksList() {
           <AddStockModal
             visible={Toggle.edit}
             selStock={selStock.current}
-            onClose={() => toogleModal("edit", false)}
+            onClose={() => {
+              toogleModal("edit", false);
+              setTimeout(() => {
+                getStocksInfo();
+              }, 1000);
+            }}
             type="Edit"
           />
         )}

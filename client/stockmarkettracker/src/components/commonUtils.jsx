@@ -41,15 +41,16 @@ const stocksOperations = (body) => {
     })
     .then((responseData) => {
       console.log("Success:", responseData);
-      return responseData
+      return responseData;
     })
     .catch((error) => {
       console.error("Error:", error);
     });
 };
 
-const showToast = (message) => {
-  toast.success(message);
+const showToast = (message, type) => {
+  if (type == "error") toast.error(message);
+  else toast.success(message);
 };
 
 const useGetApiData = ({ url, method, body = null, headers = null }) => {
