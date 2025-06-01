@@ -60,12 +60,11 @@ def getStockLivePrice(request):
 def getSingleStockData(request):
     searchUrl = "https://www.moneycontrol.com/mccode/common/autosuggestion_solr.php?classic=true&query="+request.query_params['fundName']+"&type=1&format=json&main=true"
     Data = fetchAllData.getSearchSuggestions(searchUrl)
-    # link = Data[0]["data"][0]
-    # link = link["link_src"]
-    # responseData = fetchAllData.getStockInfo(Data["data"][0])
+    link = Data[0]["link_src"]
+    responseData = fetchAllData.getStockInfo(link)
     return Response({
         'response':True,
-        'data':Data[0]
+        'data':responseData
     })
 
 @api_view(["Get"])

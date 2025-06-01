@@ -4,6 +4,9 @@ import json
 from stockmarketapi.models import StockInfo,User
 from rest_framework.response import Response
 from django.http import Http404
+from django.shortcuts import get_object_or_404
+import time
+import datetime
 
 class Api:
     """
@@ -133,13 +136,16 @@ class Api:
                 return {"operation": type}
 
             case "Edit":
-                StockInfo(
-                    user=User.objects.get(UserID=formData["userID"]),
-                    TargetPrice=formData["targetPrice"],
-                    Priority=formData["priority"],
-                    tradingType=formData["tradingType"],
-                    StockName=formData["stockName"],
-                ).save()
+                stockRecord = get_object_or_404(StockInfo, id=formData["recordID"])
+                
+                stockRecord.user = User.objects.get(UserID=formData["userID"])
+                stockRecord.TargetPrice = formData["targetPrice"]
+                stockRecord.Priority = formData["priority"]
+                stockRecord.tradingType = formData["tradingType"]
+                stockRecord.StockName = formData["stockName"]
+                
+                stockRecord.save()
+                
                 return {"operation": type}
 
             case "Delete":
