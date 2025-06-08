@@ -6,10 +6,12 @@ import Checklists from "./CheckLists";
 import { Routes, Route, Navigate } from "react-router";
 import SidePanel from "./SidePanel";
 import { StockmarketContext, stocksOperations } from "./commonUtils";
+import LoginModal from "./Login";
 import "./layout.css";
 
 function Layout() {
   const [exchangeData, setExchangeData] = useState({});
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   function FetchAllStocksData() {
     var exchangesDataResponses = [];
@@ -24,7 +26,7 @@ function Layout() {
       .then((AllStocksData) => {
         var filteredData = [];
         console.log(AllStocksData);
-        setExchangeData(AllStocksData)
+        setExchangeData(AllStocksData);
       })
       .catch((error) => console.error(error));
   }
@@ -35,7 +37,9 @@ function Layout() {
 
   return (
     <>
-      <StockmarketContext value={[exchangeData, setExchangeData]}>
+      <StockmarketContext
+        value={[exchangeData, setExchangeData, isLoggedIn, setIsLoggedIn]}
+      >
         <div class="container-fluid">
           <div class="row">
             <SidePanel />
@@ -44,7 +48,7 @@ function Layout() {
                 StockMarket Tracker
               </h3>
               <Routes>
-                <Route index element={<Navigate replace to="/StocksList" />} />
+                <Route index element={<LoginModal visible={true} />} />
                 <Route path="/StocksList" element={<StocksList />} />
                 <Route path="/MutualFunds" element={<MutualFunds />} />
                 <Route path="/Checklists" element={<Checklists />} />
