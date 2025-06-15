@@ -14,7 +14,7 @@ import { AddStockModal, DeleteStockModal } from "./StockModels";
 import { ToastContainer } from "react-toastify";
 
 function StocksList() {
-  const [exchangeData] = useContext(Exchanges);
+  const {exchangeData} = useContext(Exchanges);
   const [stocksTableObj, setStocksTableObj] = useState({
     "All Stocks": [],
     "Near Targets": [],

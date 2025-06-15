@@ -38,7 +38,7 @@ function Layout() {
   return (
     <>
       <StockmarketContext
-        value={[exchangeData, setExchangeData, isLoggedIn, setIsLoggedIn]}
+        value={{exchangeData, setExchangeData, isLoggedIn, setIsLoggedIn}}
       >
         <div class="container-fluid">
           <div class="row">

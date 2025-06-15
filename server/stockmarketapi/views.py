@@ -6,9 +6,8 @@ import datetime
 import time
 from .Scripts import Apis
 from .Scripts.Functions import fetchExchangeData
-from bs4 import BeautifulSoup
-from stockmarketapi.models import StockInfo,User
-from django.shortcuts import get_object_or_404, render, HttpResponseRedirect
+from stockmarketapi.models import User
+from django.http import Http404
 
 # import FetchAllData
         
@@ -18,6 +17,29 @@ fetchAllData = Apis.Api()
 def allStocksData(request):
     responseData = fetchAllData.allStocksData()
     return Response(responseData)
+
+@api_view(['POST'])
+def validateLoginDetails(request):
+    validate = User.objects.get(username=request.data["username"],password=request.data["password"])
+    if validate:
+        userId = User.objects.filter(username=request.data["username"]).values('UserID')
+        return Response({
+            "response":True,
+            "userId":userId
+        })
+    else:
+        Http404("user Not Exist")
+
+@api_view(['POST'])
+def addUserAccount(request):
+    exists = User.objects.filter(username=request.data["username"]).exists()
+    if exists:
+        return Http404("user already exists")
+    else:
+        User(username=request.data["username"],password=request.data["password"]).save()
+        return Response({
+            "response":True,
+        })
 
 
 @api_view(['GET'])

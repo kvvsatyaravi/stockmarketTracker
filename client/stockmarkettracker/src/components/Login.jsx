@@ -1,27 +1,57 @@
 import React, { useState, useContext } from "react";
 import { Modal, Input, Checkbox, Button, Typography, Form } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
-import { Exchanges } from "./commonUtils";
+import { Exchanges, showToast } from "./commonUtils";
 import SignUpModel from "./Signup";
+import { ToastContainer } from "react-toastify";
 
 const { Title, Text, Link } = Typography;
 
 const LoginModal = ({ visible, onCancel }) => {
   const [form] = Form.useForm();
-  const [setIsLoggedIn] = useContext(Exchanges);
+  const { setIsLoggedIn } = useContext(Exchanges);
   const [signUpModelToggle, setSignUpModelToggle] = useState(false);
   const [loginInModelToggle, setLoginInModelToggle] = useState(true);
 
-  const handleFinish = (values) => {
-    const { email, password } = values;
+  const handleFinish = async (values) => {
+    try {
+      const { user, password } = values;
+      var body = {
+        username: user,
+        password: password,
+      };
+      var res = await fetch(
+        "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/validateLoginDetails/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      res = await res.json();
+      // Replace this with your real auth logic
+      if (res.response) {
+        var now = new Date();
+        var time = now.getTime();
+        var expireTime = time + 1000 * 5000;
+        now.setTime(expireTime);
+        document.cookie =
+          "userID=" +
+          res.userId[0]["UserID"] +
+          ";expires=" +
+          now.toUTCString() +
+          ";path=/";
 
-    // Replace this with your real auth logic
-    if (email === "ravi" && password === "ravi") {
-      document.cookie = "userID=1;";
-      setIsLoggedIn(true);
-    } else {
-      alert("Invalid credentials");
-      setIsLoggedIn(false);
+        showToast("Successfully signed In");
+        setIsLoggedIn(true);
+      } else {
+        showToast("Invalid credentials", "error");
+        setIsLoggedIn(false);
+      }
+    } catch (err) {
+      showToast("Something went wrong in api", "error");
     }
   };
 
@@ -34,6 +64,7 @@ const LoginModal = ({ visible, onCancel }) => {
         centered
         width={400}
       >
+        <ToastContainer />
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <Title level={2} style={{ margin: 0 }}>
             Login
@@ -64,12 +95,18 @@ const LoginModal = ({ visible, onCancel }) => {
               marginBottom: 16,
             }}
           >
-            <Link>Forgot password</Link>
+            <Link
+              onClick={() => {
+                showToast("Working on these Functionality","error");
+              }}
+            >
+              Forgot password
+            </Link>
           </div>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Sign up
+              Login
             </Button>
           </Form.Item>
 
