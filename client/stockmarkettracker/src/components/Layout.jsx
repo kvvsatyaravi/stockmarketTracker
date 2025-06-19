@@ -7,6 +7,7 @@ import { Routes, Route, Navigate } from "react-router";
 import SidePanel from "./SidePanel";
 import { StockmarketContext, stocksOperations } from "./commonUtils";
 import LoginModal from "./Login";
+import { UserOutlined } from "@ant-design/icons";
 import "./layout.css";
 
 function Layout() {
@@ -38,17 +39,32 @@ function Layout() {
   return (
     <>
       <StockmarketContext
-        value={{exchangeData, setExchangeData, isLoggedIn, setIsLoggedIn}}
+        value={{ exchangeData, setExchangeData, isLoggedIn, setIsLoggedIn }}
       >
         <div class="container-fluid">
           <div class="row">
             <SidePanel />
             <div class="col-md-10 main-content">
-              <h3 class="mb-4 d-flex text-secondary justify-content-center">
-                StockMarket Tracker
-              </h3>
+              <div>
+                <h3 class="mb-4 d-flex text-secondary justify-content-center">
+                  StockMarket Tracker
+                </h3>
+                <div>
+                  <UserOutlined />
+                </div>
+              </div>
+
               <Routes>
-                <Route index element={<LoginModal visible={true} />} />
+                <Route
+                  index
+                  element={
+                    document.cookie.includes("userID") ? (
+                      <StocksList />
+                    ) : (
+                      <LoginModal visible={true} />
+                    )
+                  }
+                />
                 <Route path="/StocksList" element={<StocksList />} />
                 <Route path="/MutualFunds" element={<MutualFunds />} />
                 <Route path="/Checklists" element={<Checklists />} />

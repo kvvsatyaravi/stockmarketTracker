@@ -4,6 +4,7 @@ import { GoogleOutlined } from "@ant-design/icons";
 import { Exchanges, showToast } from "./commonUtils";
 import SignUpModel from "./Signup";
 import { ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router";
 
 const { Title, Text, Link } = Typography;
 
@@ -12,6 +13,7 @@ const LoginModal = ({ visible, onCancel }) => {
   const { setIsLoggedIn } = useContext(Exchanges);
   const [signUpModelToggle, setSignUpModelToggle] = useState(false);
   const [loginInModelToggle, setLoginInModelToggle] = useState(true);
+  const Navigate = useNavigate();
 
   const handleFinish = async (values) => {
     try {
@@ -46,9 +48,12 @@ const LoginModal = ({ visible, onCancel }) => {
 
         showToast("Successfully signed In");
         setIsLoggedIn(true);
+        setLoginInModelToggle(false)
+        Navigate("/StocksList")
       } else {
         showToast("Invalid credentials", "error");
         setIsLoggedIn(false);
+        setLoginInModelToggle(false)
       }
     } catch (err) {
       showToast("Something went wrong in api", "error");
