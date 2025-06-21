@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import MutualFunds from "./MutualFunds";
 import StocksList from "./StocksList";
 import Topics from "./Topics";
-import Checklists from "./CheckLists";
 import { Routes, Route, Navigate } from "react-router";
 import SidePanel from "./SidePanel";
 import { StockmarketContext, stocksOperations } from "./commonUtils";
@@ -67,7 +66,6 @@ function Layout() {
                 />
                 <Route path="/StocksList" element={<StocksList />} />
                 <Route path="/MutualFunds" element={<MutualFunds />} />
-                <Route path="/Checklists" element={<Checklists />} />
                 <Route path="/Topics" element={<Topics />} />
               </Routes>
             </div>

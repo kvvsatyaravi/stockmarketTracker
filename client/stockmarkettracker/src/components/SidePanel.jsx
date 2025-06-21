@@ -13,10 +13,6 @@ function SidePanel() {
       route: "/MutualFunds",
     },
     {
-      label: "☑️ Check List",
-      route: "/ChecksList",
-    },
-    {
       label: "📋 Topics",
       route: "/Topics",
     },

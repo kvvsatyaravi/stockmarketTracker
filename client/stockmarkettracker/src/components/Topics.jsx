@@ -1,15 +1,22 @@
 import React, { useState, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Button, Card } from "antd";
+import { Button, Card, Modal, Typography, Input, Form } from "antd";
 import { ArrowLeftOutlined, EditOutlined, DeleteFilled } from "@ant-design/icons";
 import { each } from "jquery";
 import parse from "html-react-parser";
 
 const QuillEditor = () => {
+  const [form] = Form.useForm();
   const [content, setContent] = useState("");
-  const [editorToggle, setEditorToggle] = useState(false);
+  const [toggle, setToggle] = useState("");
+  const [selCard, setSelCard] = useState({
+    title: "",
+    content: "",
+  });
+
   const quillRef = useRef(null);
+  const { Title } = Typography;
 
   const topicsList = [
     {
@@ -44,63 +51,138 @@ const QuillEditor = () => {
     },
   ];
 
-  const handleSave = () => {
+  const handleSave = (e) => {
     const html = quillRef.current?.getEditor().root.innerHTML;
 
     const body = {
       htmlcontent: html,
+      title: e.title,
       userId: 1,
     };
-    fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/setTopics/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((responseData) => {
-        console.log("Success:", responseData);
-        return responseData;
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    if (html != "<p><br></p>") {
+      // fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/setTopics/", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(body),
+      // })
+      //   .then((response) => {
+      //     if (!response.ok) {
+      //       throw new Error(`HTTP error! status: ${response.status}`);
+      //     }
+      //     return response.json();
+      //   })
+      //   .then((responseData) => {
+      //     console.log("Success:", responseData);
+      //     return responseData;
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error:", error);
+      //   });
+    } else {
+      alert("body should not be empty");
+    }
   };
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      {editorToggle ? (
-        <>
-          <ArrowLeftOutlined onClick={() => setEditorToggle(!editorToggle)} className="mb-4" />
-          {/* <h2 className="text-xl font-semibold mb-4">Quill HTML Editor</h2> */}
-          <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} className="mb-4" style={{ width: "1000px" }} />
-          <Button type="primary" onClick={() => handleSave()} className="rounded hover:bg-green-700">
+      <Modal width={800} onCancel={() => setToggle("")} footer={null} open={toggle == "topic"} title={<Title level={5}>Add Topic</Title>}>
+        <Form form={form} onFinish={(e) => handleSave(e)} layout="vertical">
+          <Form.Item name="title" label="Title" rules={[{ required: true, message: "Please write title" }]}>
+            <Input type="text" className="col-3" style={{ width: "100%" }} />
+          </Form.Item>
+
+          <Form.Item label="Body">
+            <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} className="mb-4" style={{ height: "200px" }} />
+          </Form.Item>
+
+          <Button type="primary" htmlType="submit" className="rounded hover:bg-green-700 mt-2">
             Submit Data
           </Button>
-        </>
-      ) : (
-        <Button type="primary" onClick={() => setEditorToggle(!editorToggle)}>
-          Add Topics
-        </Button>
-      )}
+        </Form>
+      </Modal>
+      <Button type="primary" className="justify-content-center text-aligin-center d-flex" onClick={() => setToggle("topic")}>
+        Add Topics
+      </Button>
 
       <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
         {topicsList.map((each) => {
           return (
             <>
-              <Card style={{ width: "300px" }} actions={[<EditOutlined />, <DeleteFilled />]}>
+              <Card
+                style={{ width: "300px", cursor: "pointer" }}
+                onClick={() => {
+                  setToggle("viewCard");
+                  setSelCard(each);
+                }}
+                actions={[
+                  <EditOutlined style={{ color: "blue" }} onClick={() => alert("Functionality Not Completed")} />,
+                  <DeleteFilled
+                    style={{ color: "red" }}
+                    onClick={() => {
+                      setToggle("delete");
+                    }}
+                  />,
+                ]}
+              >
                 <Card.Meta title={each.title} description={parse(each.content)} />
               </Card>
             </>
           );
         })}
       </div>
+
+      {
+        <Modal open={toggle == "viewCard"} onCancel={() => setToggle("")} footer={null} title={<Title level={5}>{selCard.title}</Title>}>
+          {parse(selCard.content)}
+        </Modal>
+      }
+
+      {
+        <Modal open={toggle == "delete"} onCancel={() => setToggle("")} footer={null} title={<Title level={5}>Delete Topic</Title>}>
+          <h6>Are you sure want to delete ?</h6>
+          <div className="d-flex justify-content-center gap-2 mt-3">
+            <Button
+              className="col-2"
+              type="primary"
+              style={{ background: "#091A52" }}
+              onClick={(e) => {
+                var body = {
+                  UserId: 1,
+                };
+
+                // fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/deleteTopic/", {
+                //   method: "POST",
+                //   headers: {
+                //     "Content-Type": "application/json",
+                //   },
+                //   body: JSON.stringify(body),
+                // })
+                //   .then((response) => {
+                //     if (!response.ok) {
+                //       throw new Error(`HTTP error! status: ${response.status}`);
+                //     }
+                //     return response.json();
+                //   })
+                //   .then((e) => {
+                //     console.log("toast succesfull");
+                //     setDeleteToggle(false);
+                //   })
+                //   .catch((e) => {
+                //     setDeleteToggle(false);
+                //     console.log("toast rejected");
+                //   });
+              }}
+            >
+              Yes
+            </Button>
+            <Button className="col-2" onClick={() => setToggle(false)} style={{ background: "#ff924c", color: "white", border: "none" }}>
+              No
+            </Button>
+          </div>
+        </Modal>
+      }
     </div>
   );
 };
