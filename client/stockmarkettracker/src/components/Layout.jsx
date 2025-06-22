@@ -12,6 +12,7 @@ import "./layout.css";
 function Layout() {
   const [exchangeData, setExchangeData] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [logoutUI, SetLogoutUI] = useState(false);
 
   function FetchAllStocksData() {
     var exchangesDataResponses = [];
@@ -48,8 +49,28 @@ function Layout() {
                 <h3 class="mb-4 d-flex text-secondary justify-content-center">
                   StockMarket Tracker
                 </h3>
-                <div>
-                  <UserOutlined />
+                <div className="login-user-icon">
+                  <UserOutlined onClick={() => SetLogoutUI(!logoutUI)} />
+                  {logoutUI && (
+                    <div
+                      className="logout-ui"
+                      onClick={() => {
+                        let allCookies = document.cookie.split(";");
+
+                        // The "expire" attribute of every cookie is
+                        // Set to "Thu, 01 Jan 1970 00:00:00 GMT"
+                        for (let i = 0; i < allCookies.length; i++)
+                          document.cookie =
+                            allCookies[i] +
+                            "=;expires=" +
+                            new Date(0).toUTCString();
+
+                        SetLogoutUI(false);
+                      }}
+                    >
+                      Logout
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -1,46 +1,70 @@
-.stockslist-tabs{
-    display: flex;
-    cursor: pointer;
-    gap: 10px;
+.stockslist-tabs {
+  display: flex;
+  cursor: pointer;
+  gap: 10px;
 }
 
-.stockslist-tabs div{
-    margin-inline:5px;
+.stockslist-tabs div {
+  margin-inline: 5px;
 }
 
-.active-tab{
-    color: #3954a8;
-    padding-bottom: 3px;
-    border-bottom: 3px solid #3954a8;
+.active-tab {
+  color: #3954a8;
+  padding-bottom: 3px;
+  border-bottom: 3px solid #3954a8;
 }
 
-.stocks-tabs{
-    padding-bottom: 5px;
-    gap: 12px;
-    display: flex;
-    /* width: 115px; */
-    justify-content: space-around;
+.stocks-tabs {
+  padding-bottom: 5px;
+  gap: 12px;
+  display: flex;
+  /* width: 115px; */
+  justify-content: space-around;
 }
 
-.stocks-tabs-number{
-    border-radius: 50%;
-    background: blue;
-    height: 20px;
-    width: 20px;
-    text-align: center;
-    color: white;
-    font-size: 12px;
-    margin-top: 3px;
+.stocks-tabs-number {
+  border-radius: 50%;
+  background: blue;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  color: white;
+  font-size: 12px;
+  margin-top: 3px;
 }
 
-#dropdown-shocks-button{
-    background: #ff914c;
-    border:none
+#dropdown-shocks-button {
+  background: #ff914c;
+  border: none;
 }
-
 
 .ant-typography {
-    border-bottom: 2px solid rgb(255, 146, 76);
-    padding-bottom: 5px;
-    width: 100%;
-  }
+  border-bottom: 2px solid rgb(255, 146, 76);
+  padding-bottom: 5px;
+  width: 100%;
+}
+
+.login-user-icon {
+  cursor: pointer;
+  position: fixed;
+  background: #4a7dd1;
+  height: 34px;
+  border-radius: 50%;
+  text-align: center;
+  width: 35px;
+  top: 30px;
+  right: 30px;
+  padding-top: 3px;
+}
+
+.logout-ui {
+  cursor: pointer;
+  position: absolute;
+  top: 36px;
+  z-index: 2;
+  font-size: 12px;
+  border-radius: 4px;
+  right: -7px;
+  border: 1px solid black;
+  padding: 0px 4px;
+}
