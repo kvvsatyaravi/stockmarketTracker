@@ -48,12 +48,12 @@ const LoginModal = ({ visible, onCancel }) => {
 
         showToast("Successfully signed In");
         setIsLoggedIn(true);
-        setLoginInModelToggle(false)
-        Navigate("/StocksList")
+        setLoginInModelToggle(false);
+        Navigate("/StocksList");
       } else {
         showToast("Invalid credentials", "error");
         setIsLoggedIn(false);
-        setLoginInModelToggle(false)
+        setLoginInModelToggle(false);
       }
     } catch (err) {
       showToast("Something went wrong in api", "error");
@@ -64,7 +64,10 @@ const LoginModal = ({ visible, onCancel }) => {
     <>
       <Modal
         visible={!signUpModelToggle && loginInModelToggle}
-        onCancel={() => setLoginInModelToggle(false)}
+        onCancel={() => {
+          setLoginInModelToggle(false);
+          setIsLoggedIn(false);
+        }}
         footer={null}
         centered
         width={400}
@@ -102,7 +105,7 @@ const LoginModal = ({ visible, onCancel }) => {
           >
             <Link
               onClick={() => {
-                showToast("Working on these Functionality","error");
+                showToast("Working on these Functionality", "error");
               }}
             >
               Forgot password

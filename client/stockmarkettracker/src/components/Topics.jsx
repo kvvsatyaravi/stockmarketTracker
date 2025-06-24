@@ -1,13 +1,19 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Button, Card, Modal, Typography, Input, Form } from "antd";
-import { ArrowLeftOutlined, EditOutlined, DeleteFilled } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  EditOutlined,
+  DeleteFilled,
+} from "@ant-design/icons";
+import { Exchanges } from "./commonUtils";
 import { each } from "jquery";
 import parse from "html-react-parser";
 
 const QuillEditor = () => {
   const [form] = Form.useForm();
+  const { isLoggedIn } = useContext(Exchanges);
   const [content, setContent] = useState("");
   const [toggle, setToggle] = useState("");
   const [selCard, setSelCard] = useState({
@@ -87,60 +93,129 @@ const QuillEditor = () => {
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      <Modal width={800} onCancel={() => setToggle("")} footer={null} open={toggle == "topic"} title={<Title level={5}>Add Topic</Title>}>
-        <Form form={form} onFinish={(e) => handleSave(e)} layout="vertical">
-          <Form.Item name="title" label="Title" rules={[{ required: true, message: "Please write title" }]}>
-            <Input type="text" className="col-3" style={{ width: "100%" }} />
-          </Form.Item>
-
-          <Form.Item label="Body">
-            <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} className="mb-4" style={{ height: "200px" }} />
-          </Form.Item>
-
-          <Button type="primary" htmlType="submit" className="rounded hover:bg-green-700 mt-2">
-            Submit Data
-          </Button>
-        </Form>
-      </Modal>
-      <Button type="primary" className="justify-content-center text-aligin-center d-flex" onClick={() => setToggle("topic")}>
-        Add Topics
-      </Button>
-
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-        {topicsList.map((each) => {
-          return (
-            <>
-              <Card
-                style={{ width: "300px", cursor: "pointer" }}
-                onClick={() => {
-                  setToggle("viewCard");
-                  setSelCard(each);
-                }}
-                actions={[
-                  <EditOutlined style={{ color: "blue" }} onClick={() => alert("Functionality Not Completed")} />,
-                  <DeleteFilled
-                    style={{ color: "red" }}
-                    onClick={() => {
-                      setToggle("delete");
-                    }}
-                  />,
-                ]}
+      {isLoggedIn ? (
+        <>
+          <Modal
+            width={800}
+            onCancel={() => setToggle("")}
+            footer={null}
+            open={toggle == "topic"}
+            title={<Title level={5}>Add Topic</Title>}
+          >
+            <Form form={form} onFinish={(e) => handleSave(e)} layout="vertical">
+              <Form.Item
+                name="title"
+                label="Title"
+                rules={[{ required: true, message: "Please write title" }]}
               >
-                <Card.Meta title={each.title} description={parse(each.content)} />
-              </Card>
-            </>
-          );
-        })}
-      </div>
+                <Input
+                  type="text"
+                  className="col-3"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+
+              <Form.Item label="Body">
+                <ReactQuill
+                  ref={quillRef}
+                  theme="snow"
+                  value={content}
+                  onChange={setContent}
+                  className="mb-4"
+                  style={{ height: "200px" }}
+                />
+              </Form.Item>
+
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="rounded hover:bg-green-700 mt-2"
+              >
+                Submit Data
+              </Button>
+            </Form>
+          </Modal>
+          <Button
+            type="primary"
+            className="justify-content-center text-aligin-center d-flex"
+            onClick={() => setToggle("topic")}
+          >
+            Add Topics
+          </Button>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "20px",
+              flexWrap: "wrap",
+              height: "60vh",
+              overflow: "auto",
+            }}
+          >
+            {topicsList.map((each) => {
+              return (
+                <>
+                  <Card
+                    style={{
+                      width: "300px",
+                      height: "230px",
+                      cursor: "pointer",
+                    }}
+                    actions={[
+                      <EditOutlined
+                        style={{ color: "blue" }}
+                        onClick={() => alert("Functionality Not Completed")}
+                      />,
+                      <DeleteFilled
+                        style={{ color: "red" }}
+                        onClick={() => {
+                          setToggle("delete");
+                        }}
+                      />,
+                    ]}
+                  >
+                    <Card.Meta
+                      onClick={() => {
+                        setToggle("viewCard");
+                        setSelCard(each);
+                      }}
+                      title={each.title}
+                      description={parse(each.content)}
+                    />
+                  </Card>
+                </>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <div
+          className="d-flex justify-content-center "
+          style={{ flexDirection: "column", alignItems: "center" }}
+        >
+          <img src={require("../Loginui.jpg")} height={500} width={500} />
+          <h4>Login is required</h4>
+        </div>
+      )}
 
       {
-        <Modal open={toggle == "viewCard"} onCancel={() => setToggle("")} footer={null} title={<Title level={5}>{selCard.title}</Title>}>
+        <Modal
+          open={toggle == "viewCard"}
+          onCancel={() => setToggle("")}
+          footer={null}
+          title={<Title level={5}>{selCard.title}</Title>}
+        >
           {parse(selCard.content)}
         </Modal>
       }
 
       {
-        <Modal open={toggle == "delete"} onCancel={() => setToggle("")} footer={null} title={<Title level={5}>Delete Topic</Title>}>
+        <Modal
+          open={toggle == "delete"}
+          onCancel={() => setToggle("")}
+          footer={null}
+          title={<Title level={5}>Delete Topic</Title>}
+        >
           <h6>Are you sure want to delete ?</h6>
           <div className="d-flex justify-content-center gap-2 mt-3">
             <Button
@@ -177,7 +252,11 @@ const QuillEditor = () => {
             >
               Yes
             </Button>
-            <Button className="col-2" onClick={() => setToggle(false)} style={{ background: "#ff924c", color: "white", border: "none" }}>
+            <Button
+              className="col-2"
+              onClick={() => setToggle(false)}
+              style={{ background: "#ff924c", color: "white", border: "none" }}
+            >
               No
             </Button>
           </div>

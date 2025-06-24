@@ -14,7 +14,7 @@ import { AddStockModal, DeleteStockModal } from "./StockModels";
 import { ToastContainer } from "react-toastify";
 
 function StocksList() {
-  const {exchangeData} = useContext(Exchanges);
+  const { exchangeData, isLoggedIn } = useContext(Exchanges);
   const [stocksTableObj, setStocksTableObj] = useState({
     "All Stocks": [],
     "Near Targets": [],
@@ -175,138 +175,166 @@ function StocksList() {
   return (
     <>
       <div class="d-flex justify-content-between mb-3">
-        <div className="stockslist-tabs justify-content-between">
-          {Object.keys(stocksTableObj).map((eachTab) => (
-            <div
-              className={
-                "stocks-tabs " + (eachTab == activeTab ? "active-tab" : "")
-              }
-              onClick={() => {
-                setActiveTab(eachTab);
-              }}
-            >
-              <b>{eachTab}</b>
-              <b className="stocks-tabs-number">
-                {stocksTableObj[eachTab].length}
-              </b>
+        {isLoggedIn ? (
+          <>
+            <div className="stockslist-tabs justify-content-between">
+              {Object.keys(stocksTableObj).map((eachTab) => (
+                <div
+                  className={
+                    "stocks-tabs " + (eachTab == activeTab ? "active-tab" : "")
+                  }
+                  onClick={() => {
+                    setActiveTab(eachTab);
+                  }}
+                >
+                  <b>{eachTab}</b>
+                  <b className="stocks-tabs-number">
+                    {stocksTableObj[eachTab].length}
+                  </b>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div style={{ display: "flex", gap: "15px" }}>
-          <Button style={{ background: "rgb(65 101 210)" }} onClick={() => {}}>
-            <ReloadOutlined style={{ color: "white" }} />
-          </Button>
+            <div style={{ display: "flex", gap: "15px" }}>
+              <Button
+                style={{ background: "rgb(65 101 210)" }}
+                onClick={() => {}}
+              >
+                <ReloadOutlined style={{ color: "white" }} />
+              </Button>
 
-          <Button onClick={() => toogleModal("add", true)}>
-            <PlusOutlined />
-          </Button>
-          <Input placeholder="Search Stocks" prefix={<SearchOutlined />} />
-          <DropdownButton
-            id="dropdown-shocks-button"
-            title="Positional trading"
-            size="sm"
-          >
-            <Dropdown.Item href="#/action-1">Positional trading</Dropdown.Item>
-            <Dropdown.Item href="#/action-3">Investment</Dropdown.Item>
-          </DropdownButton>
-        </div>
-      </div>
-      <div style={{ height: "80%", overflow: "auto" }}>
-        <table class="table table-bordered table-hover bg-white" border={0}>
-          <thead class="table-light">
-            <tr className="text-center">
-              {stocksTableObj[activeTab].length
-                ? stocksTableDefinition.map((e) => (
-                    <>
-                      <th style={{ width: e.width }}>{e.Label}</th>
-                    </>
-                  ))
-                : ""}
-            </tr>
-          </thead>
-          <tbody>
-            {stocksTableObj[activeTab].length
-              ? stocksTableObj[activeTab].map((eachStock) => (
-                  <tr>
-                    {stocksTableDefinition.map((e) =>
-                      e.format ? (
-                        e.format == "edit" ? (
+              <Button onClick={() => toogleModal("add", true)}>
+                <PlusOutlined />
+              </Button>
+              <Input placeholder="Search Stocks" prefix={<SearchOutlined />} />
+              <DropdownButton
+                id="dropdown-shocks-button"
+                title="Positional trading"
+                size="sm"
+              >
+                <Dropdown.Item href="#/action-1">
+                  Positional trading
+                </Dropdown.Item>
+                <Dropdown.Item href="#/action-3">Investment</Dropdown.Item>
+              </DropdownButton>
+            </div>
+
+            <div style={{ height: "80%", overflow: "auto" }}>
+              <table
+                class="table table-bordered table-hover bg-white"
+                border={0}
+              >
+                <thead class="table-light">
+                  <tr className="text-center">
+                    {stocksTableObj[activeTab].length
+                      ? stocksTableDefinition.map((e) => (
                           <>
-                            <td className="text-center"
-                              type="primary"
-                              onClick={() => {
-                                selStock.current = eachStock;
-                                toogleModal("edit", true);
-                              }}
-                            >
-                              <EditOutlined />
-                            </td>
+                            <th style={{ width: e.width }}>{e.Label}</th>
                           </>
-                        ) : (
-                          <>
-                            <td
-                              className="text-center"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => {
-                                selStock.current = eachStock;
-                                toogleModal("delete", true);
-                              }}
-                            >
-                              <DeleteOutlined />
-                            </td>
-                          </>
-                        )
-                      ) : (
-                        <>
-                          <td className="text-center">{eachStock[e.field]}</td>
-                        </>
-                      )
-                    )}
+                        ))
+                      : ""}
                   </tr>
-                ))
-              : ""}
-          </tbody>
-        </table>
+                </thead>
+                <tbody>
+                  {stocksTableObj[activeTab].length
+                    ? stocksTableObj[activeTab].map((eachStock) => (
+                        <tr>
+                          {stocksTableDefinition.map((e) =>
+                            e.format ? (
+                              e.format == "edit" ? (
+                                <>
+                                  <td
+                                    className="text-center"
+                                    type="primary"
+                                    onClick={() => {
+                                      selStock.current = eachStock;
+                                      toogleModal("edit", true);
+                                    }}
+                                  >
+                                    <EditOutlined />
+                                  </td>
+                                </>
+                              ) : (
+                                <>
+                                  <td
+                                    className="text-center"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => {
+                                      selStock.current = eachStock;
+                                      toogleModal("delete", true);
+                                    }}
+                                  >
+                                    <DeleteOutlined />
+                                  </td>
+                                </>
+                              )
+                            ) : (
+                              <>
+                                <td className="text-center">
+                                  {eachStock[e.field]}
+                                </td>
+                              </>
+                            )
+                          )}
+                        </tr>
+                      ))
+                    : ""}
+                </tbody>
+              </table>
 
-        <ToastContainer />
-        {Toggle.add && (
-          <AddStockModal
-          allStocksData={stocksTableObj["All Stocks"]}
-            visible={Toggle.add}
-            onClose={() => {
-              toogleModal("add", false);
-              setTimeout(() => {
-                getStocksInfo();
-              }, 1000);
+              <ToastContainer />
+              {Toggle.add && (
+                <AddStockModal
+                  allStocksData={stocksTableObj["All Stocks"]}
+                  visible={Toggle.add}
+                  onClose={() => {
+                    toogleModal("add", false);
+                    setTimeout(() => {
+                      getStocksInfo();
+                    }, 1000);
+                  }}
+                  type="Add"
+                />
+              )}
+              {Toggle.edit && (
+                <AddStockModal
+                  visible={Toggle.edit}
+                  selStock={selStock.current}
+                  onClose={() => {
+                    toogleModal("edit", false);
+                    setTimeout(() => {
+                      getStocksInfo();
+                    }, 1000);
+                  }}
+                  type="Edit"
+                />
+              )}
+              {Toggle.delete && (
+                <DeleteStockModal
+                  selStock={selStock.current}
+                  visible={Toggle.delete}
+                  onClose={() => {
+                    toogleModal("delete", false);
+                    setTimeout(() => {
+                      getStocksInfo();
+                    }, 1000);
+                  }}
+                />
+              )}
+            </div>
+          </>
+        ) : (
+          <div
+            className="d-flex justify-content-center "
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
             }}
-            type="Add"
-          />
-        )}
-        {Toggle.edit && (
-          <AddStockModal
-            visible={Toggle.edit}
-            selStock={selStock.current}
-            onClose={() => {
-              toogleModal("edit", false);
-              setTimeout(() => {
-                getStocksInfo();
-              }, 1000);
-            }}
-            type="Edit"
-          />
-        )}
-        {Toggle.delete && (
-          <DeleteStockModal
-            selStock={selStock.current}
-            visible={Toggle.delete}
-            onClose={() => {
-              toogleModal("delete", false);
-              setTimeout(() => {
-                getStocksInfo();
-              }, 1000);
-            }}
-          />
+          >
+            <img src={require("../Loginui.jpg")} height={500} width={500} />
+            <h4>Login is required</h4>
+          </div>
         )}
       </div>
     </>

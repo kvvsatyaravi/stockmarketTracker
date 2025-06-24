@@ -66,6 +66,7 @@ function Layout() {
                             new Date(0).toUTCString();
 
                         SetLogoutUI(false);
+                        window.location.reload()
                       }}
                     >
                       Logout
