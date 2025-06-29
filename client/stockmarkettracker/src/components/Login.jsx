@@ -68,6 +68,9 @@ const LoginModal = ({ visible, onCancel }) => {
           setLoginInModelToggle(false);
           setIsLoggedIn(false);
         }}
+        afterClose={()=>{
+          setIsLoggedIn(false);
+        }}
         footer={null}
         centered
         width={400}

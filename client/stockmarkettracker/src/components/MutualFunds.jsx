@@ -110,7 +110,6 @@ const MutualFunds = () => {
       });
       console.log(fundsPortfoolioData);
       setPortifolioApiData(fundsPortfoolioData);
-      setLoader(false);
       getOverlappingStocks();
     });
   };
@@ -173,6 +172,7 @@ const MutualFunds = () => {
       console.log(total);
       total.unshift("Total");
       setAvgApiData(total);
+      setLoader(false);
     }
   }, [fundsApiData]);
 
@@ -346,7 +346,7 @@ const MutualFunds = () => {
               <div className="col-2">
                 <b>funds overlap Data:</b>
               </div>
-              <div className="col-8">20%</div>
+              <div className="col-8"></div>
               <div
                 className="col-2"
                 style={{ textDecoration: "underline", cursor: "pointer" }}

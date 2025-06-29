@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import MutualFunds from "./MutualFunds";
 import StocksList from "./StocksList";
 import Topics from "./Topics";
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route, useNavigate } from "react-router";
 import SidePanel from "./SidePanel";
 import { StockmarketContext, stocksOperations } from "./commonUtils";
 import LoginModal from "./Login";
@@ -13,6 +13,7 @@ function Layout() {
   const [exchangeData, setExchangeData] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [logoutUI, SetLogoutUI] = useState(false);
+  const Navigate = useNavigate();
 
   function FetchAllStocksData() {
     var exchangesDataResponses = [];
@@ -70,7 +71,7 @@ function Layout() {
                             new Date(0).toUTCString();
 
                         SetLogoutUI(false);
-                        window.location.reload("/")
+                        Navigate("/")
                       }}
                     >
                       Logout
