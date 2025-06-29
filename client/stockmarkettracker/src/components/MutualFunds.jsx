@@ -126,12 +126,18 @@ const MutualFunds = () => {
   useEffect(() => {
     console.log(response);
     if (response) {
-      var searchResponseData = response.data.map((eachFund) => {
-        return {
-          label: eachFund.name,
-          value: eachFund.link_src,
-        };
-      });
+      var searchResponseData = response.data
+        .filter(
+          (e) =>
+            !e.link_src.includes("amc-details") &&
+            !e.link_src.includes("new-fund-offers")
+        )
+        .map((eachFund) => {
+          return {
+            label: eachFund.name,
+            value: eachFund.link_src,
+          };
+        });
       setFundOptions(searchResponseData);
     }
   }, [response]);

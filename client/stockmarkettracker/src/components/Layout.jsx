@@ -34,6 +34,10 @@ function Layout() {
 
   useEffect(() => {
     FetchAllStocksData();
+
+    if(document.cookie.includes("userID")){
+      setIsLoggedIn(true)
+    }
   }, []);
 
   return (
@@ -66,7 +70,7 @@ function Layout() {
                             new Date(0).toUTCString();
 
                         SetLogoutUI(false);
-                        window.location.reload()
+                        window.location.reload("/")
                       }}
                     >
                       Logout

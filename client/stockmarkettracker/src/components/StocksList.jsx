@@ -174,9 +174,9 @@ function StocksList() {
 
   return (
     <>
-      <div class="d-flex justify-content-between mb-3">
         {isLoggedIn ? (
           <>
+          <div class="d-flex justify-content-between mb-3">
             <div className="stockslist-tabs justify-content-between">
               {Object.keys(stocksTableObj).map((eachTab) => (
                 <div
@@ -217,6 +217,7 @@ function StocksList() {
                 </Dropdown.Item>
                 <Dropdown.Item href="#/action-3">Investment</Dropdown.Item>
               </DropdownButton>
+            </div>
             </div>
 
             <div style={{ height: "80%", overflow: "auto" }}>
@@ -336,7 +337,6 @@ function StocksList() {
             <h4>Login is required</h4>
           </div>
         )}
-      </div>
     </>
   );
 }
