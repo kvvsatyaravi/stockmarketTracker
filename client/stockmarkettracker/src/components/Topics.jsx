@@ -135,20 +135,19 @@ const QuillEditor = () => {
               </Button>
             </Form>
           </Modal>
-          <Button
-            type="primary"
-            className="justify-content-center text-aligin-center d-flex"
-            onClick={() => setToggle("topic")}
-          >
-            Add Topics
-          </Button>
+
+          <div className="justify-content-center text-aligin-center d-flex mb-2">
+            <Button type="primary" onClick={() => setToggle("topic")}>
+              Add Topics
+            </Button>
+          </div>
 
           <div
             style={{
               display: "flex",
               gap: "20px",
               flexWrap: "wrap",
-              height: "60vh",
+              height: "75vh",
               overflow: "auto",
             }}
           >
@@ -157,7 +156,7 @@ const QuillEditor = () => {
                 <>
                   <Card
                     style={{
-                      width: "300px",
+                      width: "245px",
                       height: "230px",
                       cursor: "pointer",
                     }}

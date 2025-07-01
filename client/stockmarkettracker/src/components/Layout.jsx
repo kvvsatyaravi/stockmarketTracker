@@ -54,8 +54,8 @@ function Layout() {
                 <h3 class="mb-4 d-flex text-secondary justify-content-center">
                   StockMarket Tracker
                 </h3>
-                <div className="login-user-icon">
-                  <UserOutlined onClick={() => SetLogoutUI(!logoutUI)} />
+                <div className="login-user-icon" onClick={() => SetLogoutUI(!logoutUI)} >
+                  <UserOutlined />
                   {logoutUI && (
                     <div
                       className="logout-ui"
