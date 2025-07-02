@@ -11,5 +11,7 @@ urlpatterns = [
     path('stocksOperations/',views.StocksData,name='stocksOperations'),
     path('singleStockInfo/',views.getSingleStockData,name='singleStockInfo'),
     path('validateLoginDetails/',views.validateLoginDetails,name='validateLoginDetails'),
-    path('addUserAccount/',views.addUserAccount,name='addUserAccount')
+    path('addUserAccount/',views.addUserAccount,name='addUserAccount'),
+    path('setTopics/',views.setTopics,name='setTopics'),
+    path('deleteTopics/',views.deleteTopics,name='deleteTopics')
 ]

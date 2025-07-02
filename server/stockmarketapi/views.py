@@ -6,7 +6,7 @@ import datetime
 import time
 from .Scripts import Apis
 from .Scripts.Functions import fetchExchangeData
-from stockmarketapi.models import User
+from stockmarketapi.models import User,Topics
 from django.http import Http404
 
 # import FetchAllData
@@ -155,3 +155,27 @@ def StocksData(request):
     )
     print(data)
     return Response({**data, "response": True})
+
+@api_view(['POST'])
+def setTopics(request):
+    Topics(
+        user = User.objects.get(UserID=request.data["userID"]),
+        title = request.data["title"],
+        content = request.data["htmlcontent"]
+    ).save()
+    
+    return Response({
+        'response':True
+    })
+
+@api_view(['POST'])
+def deleteTopics(request):
+    try:
+        getRecordId = Topics.objects.get(id=request.data["id"])
+    except Topics.DoesNotExist:
+        raise Http404("record not existed in DataBase")
+    getRecordId.delete()
+
+    return Response({
+        'response':True
+    })

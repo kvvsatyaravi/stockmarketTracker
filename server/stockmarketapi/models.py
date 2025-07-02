@@ -11,11 +11,15 @@ class User(models.Model):
 
 class StockInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='UserID')
-    EditDate = models.DateField(auto_now=True,null=True)
+    EditDate = models.DateField()
     TargetPrice = models.FloatField()
     Priority = models.CharField(max_length=10)
-    tradingType = models.CharField(max_length=25,default='-')
-    StockName = models.CharField(max_length=50,default='-')
+    TargetType = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.EditDate}"
+    
+class Topics(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='UserID')
+    title = models.CharField(max_length=100,default='-')
+    content = models.TextField()
