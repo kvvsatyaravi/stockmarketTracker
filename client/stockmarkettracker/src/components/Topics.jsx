@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Button, Card, Modal, Typography, Input, Form } from "antd";
@@ -8,13 +8,14 @@ import {
   DeleteFilled,
 } from "@ant-design/icons";
 import { Exchanges } from "./commonUtils";
-import { each } from "jquery";
+import { showToast } from "./commonUtils";
 import parse from "html-react-parser";
 
 const QuillEditor = () => {
   const [form] = Form.useForm();
   const { isLoggedIn } = useContext(Exchanges);
   const [content, setContent] = useState("");
+  const [topicsData, setTopicsData] = useState([]);
   const [toggle, setToggle] = useState("");
   const [selCard, setSelCard] = useState({
     title: "",
@@ -24,38 +25,21 @@ const QuillEditor = () => {
   const quillRef = useRef(null);
   const { Title } = Typography;
 
-  const topicsList = [
-    {
-      id: 1,
-      content: "<h3>testing</h3><br><p>temp</p>",
-      title: "test",
-    },
-    {
-      id: 2,
-      content: "<h3>testing1</h3><br><p>temp2</p>",
-      title: "test 2",
-    },
-    {
-      id: 1,
-      content: "<h3>testing</h3><br><p>temp</p>",
-      title: "test",
-    },
-    {
-      id: 2,
-      content: "<h3>testing1</h3><br><p>temp2</p>",
-      title: "test 2",
-    },
-    {
-      id: 1,
-      content: "<h3>testing</h3><br><p>temp</p>",
-      title: "test",
-    },
-    {
-      id: 2,
-      content: "<h3>testing1</h3><br><p>temp2</p>",
-      title: "test 2",
-    },
-  ];
+  const getAllTopics = () => {
+    fetch(
+      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getTopics/"
+    )
+      .then((e) => e.json())
+      .then((e) => {
+        setTopicsData([...e.data]);
+      });
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      getAllTopics();
+    }
+  }, [isLoggedIn]);
 
   const handleSave = (e) => {
     const html = quillRef.current?.getEditor().root.innerHTML;
@@ -67,14 +51,8 @@ const QuillEditor = () => {
     };
     if (html != "<p><br></p>") {
       fetch(
-        "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/setTopics/",
-         {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      })
+        "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/setTopics/"
+      )
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -83,10 +61,13 @@ const QuillEditor = () => {
         })
         .then((responseData) => {
           console.log("Success:", responseData);
+          getAllTopics();
+          showToast("Successfully added in topics database");
           return responseData;
         })
         .catch((error) => {
           console.error("Error:", error);
+          showToast("Some error there in serverside", "error");
         });
     } else {
       alert("body should not be empty");
@@ -96,15 +77,6 @@ const QuillEditor = () => {
   return (
     <div className="p-4 max-w-3xl mx-auto">
       {isLoggedIn ? (
-        <div
-          className="d-flex justify-content-center "
-          style={{ flexDirection: "column", alignItems: "center" }}
-        >
-          <img src={require("../logui.jpg")} height={500} width={500} />
-          <h4>Login is required</h4>
-        </div>
-      )
-      :(
         <>
           <Modal
             width={800}
@@ -162,42 +134,52 @@ const QuillEditor = () => {
               overflow: "auto",
             }}
           >
-            {topicsList.map((each) => {
-              return (
-                <>
-                  <Card
-                    style={{
-                      width: "245px",
-                      height: "230px",
-                      cursor: "pointer",
-                    }}
-                    actions={[
-                      <EditOutlined
-                        style={{ color: "blue" }}
-                        onClick={() => alert("Functionality Not Completed")}
-                      />,
-                      <DeleteFilled
-                        style={{ color: "red" }}
-                        onClick={() => {
-                          setToggle("delete");
+            {topicsData.length
+              ? topicsData.map((each) => {
+                  return (
+                    <>
+                      <Card
+                        style={{
+                          width: "245px",
+                          height: "230px",
+                          cursor: "pointer",
                         }}
-                      />,
-                    ]}
-                  >
-                    <Card.Meta
-                      onClick={() => {
-                        setToggle("viewCard");
-                        setSelCard(each);
-                      }}
-                      title={each.title}
-                      description={parse(each.content)}
-                    />
-                  </Card>
-                </>
-              );
-            })}
+                        actions={[
+                          <EditOutlined
+                            style={{ color: "blue" }}
+                            onClick={() => alert("Functionality Not Completed")}
+                          />,
+                          <DeleteFilled
+                            style={{ color: "red" }}
+                            onClick={() => {
+                              setToggle("delete");
+                            }}
+                          />,
+                        ]}
+                      >
+                        <Card.Meta
+                          onClick={() => {
+                            setToggle("viewCard");
+                            setSelCard(each);
+                          }}
+                          title={each.title}
+                          description={parse(each.content)}
+                        />
+                      </Card>
+                    </>
+                  );
+                })
+              : "No Data Found"}
           </div>
         </>
+      ) : (
+        <div
+          className="d-flex justify-content-center "
+          style={{ flexDirection: "column", alignItems: "center" }}
+        >
+          <img src={require("../Loginui.jpg")} height={500} width={500} />
+          <h4>Login is required</h4>
+        </div>
       )}
 
       {
@@ -226,16 +208,19 @@ const QuillEditor = () => {
               style={{ background: "#091A52" }}
               onClick={(e) => {
                 var body = {
-                  UserID: 1,
+                  id: 1,
                 };
 
-                fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/deleteTopic/", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(body),
-                })
+                fetch(
+                  "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/deleteTopics/",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
+                  }
+                )
                   .then((response) => {
                     if (!response.ok) {
                       throw new Error(`HTTP error! status: ${response.status}`);
@@ -245,10 +230,13 @@ const QuillEditor = () => {
                   .then((e) => {
                     console.log("toast succesfull");
                     setToggle("");
+                    getAllTopics();
+                    showToast("Successfully deleted record");
                   })
                   .catch((e) => {
                     setToggle("");
                     console.log("toast rejected");
+                    showToast("Some error there in serverside", "error");
                   });
               }}
             >
