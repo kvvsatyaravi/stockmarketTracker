@@ -132,6 +132,7 @@ class Api:
                     Priority=formData["priority"],
                     tradingType=formData["tradingType"],
                     StockName=formData["stockName"],
+                    TargetType = formData["targetType"]
                 ).save()
                 return {"operation": type}
 
@@ -143,7 +144,7 @@ class Api:
                 stockRecord.Priority = formData["priority"]
                 stockRecord.tradingType = formData["tradingType"]
                 stockRecord.StockName = formData["stockName"]
-                
+                stockRecord.TargetType = formData["targetType"]
                 stockRecord.save()
                 
                 return {"operation": type}
@@ -160,6 +161,6 @@ class Api:
             case "Retrive":
                 allDataDic = {}
                 usersData = StockInfo.objects.all()
-                allDataDic['data'] = [{'id':u.id,'targetPrice': u.TargetPrice, 'Priority': u.Priority,'tradingType':u.tradingType,'StockName':u.StockName,'EditDate':u.EditDate} for u in usersData]
+                allDataDic['data'] = [{'id':u.id,'targetPrice': u.TargetPrice, 'Priority': u.Priority,'tradingType':u.tradingType,'TargetType':u.TargetType,'StockName':u.StockName,'EditDate':u.EditDate} for u in usersData]
                 return allDataDic
 

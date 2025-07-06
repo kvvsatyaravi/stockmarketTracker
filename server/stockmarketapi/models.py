@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class User(models.Model):
@@ -11,7 +12,7 @@ class User(models.Model):
 
 class StockInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='UserID')
-    EditDate = models.DateField()
+    EditDate = models.DateField(default=timezone.now)
     TargetPrice = models.FloatField()
     Priority = models.CharField(max_length=10)
     TargetType = models.CharField(max_length=10, null=True, blank=True)
