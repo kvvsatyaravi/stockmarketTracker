@@ -63,29 +63,31 @@ const QuillEditor = () => {
     const body = {
       htmlcontent: html,
       title: e.title,
-      userId: 1,
+      userID: 1,
     };
     if (html != "<p><br></p>") {
-      // fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/setTopics/", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(body),
-      // })
-      //   .then((response) => {
-      //     if (!response.ok) {
-      //       throw new Error(`HTTP error! status: ${response.status}`);
-      //     }
-      //     return response.json();
-      //   })
-      //   .then((responseData) => {
-      //     console.log("Success:", responseData);
-      //     return responseData;
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error:", error);
-      //   });
+      fetch(
+        "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/setTopics/",
+         {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((responseData) => {
+          console.log("Success:", responseData);
+          return responseData;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     } else {
       alert("body should not be empty");
     }
@@ -94,6 +96,15 @@ const QuillEditor = () => {
   return (
     <div className="p-4 max-w-3xl mx-auto">
       {isLoggedIn ? (
+        <div
+          className="d-flex justify-content-center "
+          style={{ flexDirection: "column", alignItems: "center" }}
+        >
+          <img src={require("../logui.jpg")} height={500} width={500} />
+          <h4>Login is required</h4>
+        </div>
+      )
+      :(
         <>
           <Modal
             width={800}
@@ -187,14 +198,6 @@ const QuillEditor = () => {
             })}
           </div>
         </>
-      ) : (
-        <div
-          className="d-flex justify-content-center "
-          style={{ flexDirection: "column", alignItems: "center" }}
-        >
-          <img src={require("../Loginui.jpg")} height={500} width={500} />
-          <h4>Login is required</h4>
-        </div>
       )}
 
       {
@@ -223,30 +226,30 @@ const QuillEditor = () => {
               style={{ background: "#091A52" }}
               onClick={(e) => {
                 var body = {
-                  UserId: 1,
+                  UserID: 1,
                 };
 
-                // fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/deleteTopic/", {
-                //   method: "POST",
-                //   headers: {
-                //     "Content-Type": "application/json",
-                //   },
-                //   body: JSON.stringify(body),
-                // })
-                //   .then((response) => {
-                //     if (!response.ok) {
-                //       throw new Error(`HTTP error! status: ${response.status}`);
-                //     }
-                //     return response.json();
-                //   })
-                //   .then((e) => {
-                //     console.log("toast succesfull");
-                //     setDeleteToggle(false);
-                //   })
-                //   .catch((e) => {
-                //     setDeleteToggle(false);
-                //     console.log("toast rejected");
-                //   });
+                fetch("https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/deleteTopic/", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(body),
+                })
+                  .then((response) => {
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                  })
+                  .then((e) => {
+                    console.log("toast succesfull");
+                    setToggle("");
+                  })
+                  .catch((e) => {
+                    setToggle("");
+                    console.log("toast rejected");
+                  });
               }}
             >
               Yes

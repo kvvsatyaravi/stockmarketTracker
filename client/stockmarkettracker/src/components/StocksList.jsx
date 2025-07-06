@@ -17,8 +17,8 @@ function StocksList() {
   const { exchangeData, isLoggedIn } = useContext(Exchanges);
   const [stocksTableObj, setStocksTableObj] = useState({
     "All Stocks": [],
-    "Near Targets": [],
-    "Far Targets": [],
+    "Buy Targets": [],
+    "Sell Targets": [],
   });
   const [activeTab, setActiveTab] = useState("All Stocks");
   const [Toggle, setToggle] = useState({
@@ -27,6 +27,8 @@ function StocksList() {
     edit: false,
   });
   const selStock = useRef({});
+  const prevData = useRef({});
+  const [tradeType, setTradeType] = useState("Positional Trading");
 
   const stocksTableDefinition = [
     {
@@ -48,6 +50,11 @@ function StocksList() {
       field: "targetPrice",
       Label: "Target Price",
       width: "10%",
+    },
+    {
+      field: "TargetType",
+      Label: "Target Type",
+      width: "15%",
     },
     {
       field: "Priority",
@@ -95,6 +102,7 @@ function StocksList() {
             CurrentPrice: data.LTP,
             targetPrice: details.targetPrice,
             Priority: details.Priority,
+             TargetType: details.TargetType,
             ChangeDiff: (
               parseFloat(details.targetPrice) - parseFloat(data.LTP)
             ).toFixed(2),
@@ -119,6 +127,7 @@ function StocksList() {
               CurrentPrice: stockInfo.LTP,
               targetPrice: details.targetPrice,
               Priority: details.Priority,
+               TargetType: details.TargetType,
               ChangeDiff: (
                 parseFloat(details.targetPrice) - parseFloat(stockInfo.LTP)
               ).toFixed(2),
@@ -144,6 +153,7 @@ function StocksList() {
               CurrentPrice: price,
               targetPrice: details.targetPrice,
               Priority: details.Priority,
+               TargetType: details.TargetType,
               ChangeDiff: (
                 parseFloat(details.targetPrice) - parseFloat(price)
               ).toFixed(2),
@@ -152,11 +162,12 @@ function StocksList() {
         }
       }
 
-      setStocksTableObj({
+       setStocksTableObj({
         "All Stocks": dataArr,
-        "Near Targets": [],
-        "Far Targets": [],
+        "Buy Targets": dataArr.filter((e) => e.TargetType == "Buy"),
+        "Sell Targets": dataArr.filter((e) => e.TargetType == "Sell"),
       });
+      prevData.current = dataArr;
     });
   };
 
@@ -169,6 +180,19 @@ function StocksList() {
       var initialValues = { add: false, delete: false, edit: false };
       initialValues[name] = toggle;
       return initialValues;
+    });
+  };
+
+   const searchStocks = (evt) => {
+    setStocksTableObj((oldObj) => {
+      const filterData = prevData.current.filter((e) => {
+ return e.StockName.lowerCase().includes(evt.target.value.lowerCase());
+      });
+      return {
+        "All Stocks": filterData,
+        "Buy Targets": filterData.filter((e) => e.TargetType == "Buy"),
+        "Sell Targets": filterData.filter((e) => e.TargetType == "Sell"),
+      };
     });
   };
 
@@ -206,7 +230,7 @@ function StocksList() {
               <Button onClick={() => toogleModal("add", true)}>
                 <PlusOutlined />
               </Button>
-              <Input placeholder="Search Stocks" prefix={<SearchOutlined />} />
+              <Input placeholder="Search Stocks" onBlur={searchStocks} prefix={<SearchOutlined />} />
               <DropdownButton
                 id="dropdown-shocks-button"
                 title="Positional trading"

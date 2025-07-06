@@ -15,6 +15,8 @@ class StockInfo(models.Model):
     TargetPrice = models.FloatField()
     Priority = models.CharField(max_length=10)
     TargetType = models.CharField(max_length=10, null=True, blank=True)
+    tradingType = models.CharField(max_length=20, null=True, blank=True)
+    StockName = models.CharField(max_length=60, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.EditDate}"

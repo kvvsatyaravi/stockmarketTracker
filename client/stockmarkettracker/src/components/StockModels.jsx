@@ -47,6 +47,7 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
         TargetPrice: selStock.targetPrice,
         Priority: selStock.Priority,
         investmentType: "Positional",
+         TargetType: selStock.TargetType,
       });
     }
   }, [selStock]);
@@ -99,6 +100,7 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
             priority: data.Priority,
             tradingType: data.investmentType,
             stockName: data.name,
+              targetType: data.TargetType,
           },
         })
           .then((e) => {
@@ -223,6 +225,17 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
             <Option value="High">High</Option>
             <Option value="Medium">Medium</Option>
             <Option value="Low">Low</Option>
+          </Select>
+        </Form.Item>
+        
+        <Form.Item
+          name="TargetType"
+          label="Target Type"
+          rules={[{ required: true, message: "Please select Target Type" }]}
+        >
+          <Select style={{ width: 120 }}>
+            <Option value="Buy">Buy</Option>
+            <Option value="Sell">Sell</Option>
           </Select>
         </Form.Item>
 
