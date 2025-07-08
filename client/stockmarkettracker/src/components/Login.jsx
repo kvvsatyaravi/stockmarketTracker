@@ -56,7 +56,9 @@ const LoginModal = ({ visible, onCancel }) => {
         setLoginInModelToggle(false);
       }
     } catch (err) {
-      showToast("Something went wrong in api", "error");
+      showToast("Invalid credentials", "error");
+      setIsLoggedIn(false);
+      setLoginInModelToggle(false);
     }
   };
 
@@ -68,7 +70,7 @@ const LoginModal = ({ visible, onCancel }) => {
           setLoginInModelToggle(false);
           setIsLoggedIn(false);
         }}
-        afterClose={()=>{
+        afterClose={() => {
           setIsLoggedIn(false);
         }}
         footer={null}
