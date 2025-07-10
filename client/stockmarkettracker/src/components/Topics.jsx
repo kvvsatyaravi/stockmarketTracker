@@ -7,7 +7,7 @@ import {
   EditOutlined,
   DeleteFilled,
 } from "@ant-design/icons";
-import { Exchanges } from "./commonUtils";
+import { Exchanges,getCookieValue } from "./commonUtils";
 import { showToast } from "./commonUtils";
 import parse from "html-react-parser";
 
@@ -70,7 +70,7 @@ const QuillEditor = () => {
           console.log("Success:", responseData);
           getAllTopics();
           showToast("Successfully added in topics database");
-          return responseData;
+        setToggle("");
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -140,6 +140,8 @@ const QuillEditor = () => {
               height: "75vh",
               overflow: "auto",
             }}
+
+            className="custom-card-container"
           >
             {topicsData.length
               ? topicsData.map((each) => {
@@ -236,9 +238,9 @@ const QuillEditor = () => {
                   })
                   .then((e) => {
                     console.log("toast succesfull");
-                    setToggle("");
                     getAllTopics();
                     showToast("Successfully deleted record");
+                    setToggle("");
                   })
                   .catch((e) => {
                     setToggle("");

@@ -4,7 +4,11 @@ import StocksList from "./StocksList";
 import Topics from "./Topics";
 import { Routes, Route, useNavigate } from "react-router";
 import SidePanel from "./SidePanel";
-import { StockmarketContext, stocksOperations } from "./commonUtils";
+import {
+  StockmarketContext,
+  stocksOperations,
+  getCookieValue,
+} from "./commonUtils";
 import LoginModal from "./Login";
 import { UserOutlined } from "@ant-design/icons";
 import "./layout.css";
@@ -13,6 +17,7 @@ function Layout() {
   const [exchangeData, setExchangeData] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [logoutUI, SetLogoutUI] = useState(false);
+  const [userId, setUserId] = useState(null);
   const Navigate = useNavigate();
 
   function FetchAllStocksData() {
@@ -36,15 +41,23 @@ function Layout() {
   useEffect(() => {
     FetchAllStocksData();
 
-    if(document.cookie.includes("userID")){
-      setIsLoggedIn(true)
+    if (document.cookie.includes("userID")) {
+      setIsLoggedIn(true);
+      const id = parseInt(getCookieValue("userID"));
+      setUserId(id);
     }
   }, []);
 
   return (
     <>
       <StockmarketContext
-        value={{ exchangeData, setExchangeData, isLoggedIn, setIsLoggedIn }}
+        value={{
+          exchangeData,
+          setExchangeData,
+          isLoggedIn,
+          setIsLoggedIn,
+          userId,
+        }}
       >
         <div class="container-fluid">
           <div class="row">
@@ -54,7 +67,10 @@ function Layout() {
                 <h3 class="mb-4 d-flex text-secondary justify-content-center">
                   StockMarket Tracker
                 </h3>
-                <div className="login-user-icon" onClick={() => SetLogoutUI(!logoutUI)} >
+                <div
+                  className="login-user-icon"
+                  onClick={() => SetLogoutUI(!logoutUI)}
+                >
                   <UserOutlined />
                   {logoutUI && (
                     <div
@@ -71,7 +87,7 @@ function Layout() {
                             new Date(0).toUTCString();
 
                         SetLogoutUI(false);
-                        Navigate("/")
+                        Navigate("/");
                       }}
                     >
                       Logout

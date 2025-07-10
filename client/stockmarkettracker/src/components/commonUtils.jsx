@@ -22,6 +22,17 @@ const Loader = () => {
   );
 };
 
+function getCookieValue(key) {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === key) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null; // or undefined if you prefer
+}
+
 const stocksOperations = (body) => {
   return fetch(
     "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/stocksOperations/",
@@ -85,4 +96,5 @@ export {
   Loader,
   stocksOperations,
   showToast,
+  getCookieValue
 };
