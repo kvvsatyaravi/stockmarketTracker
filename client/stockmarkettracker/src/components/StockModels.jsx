@@ -1,7 +1,12 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import { Modal, Form, Input, Select, Button, Row, Col, Typography } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
-import { useGetApiData, stocksOperations, showToast } from "./commonUtils";
+import {
+  useGetApiData,
+  stocksOperations,
+  showToast,
+  Exchanges,
+} from "./commonUtils";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -13,6 +18,8 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
   const [searchValue, SetSearchValue] = useState(" ");
   const [selStockApiUrl, setSelStockApiUrl] = useState("");
   const [intiVal, setIntiVal] = useState({});
+
+  const { userId, setUserId } = useContext(Exchanges);
 
   const { response, loading, error } = useGetApiData({
     method: "get",
@@ -47,7 +54,7 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
         TargetPrice: selStock.targetPrice,
         Priority: selStock.Priority,
         investmentType: "Positional",
-         TargetType: selStock.TargetType,
+        TargetType: selStock.TargetType,
       });
     }
   }, [selStock]);
@@ -75,11 +82,12 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
           stocksOperations({
             operationType: "Add",
             recordDetails: {
-              userID: 1,
+              userID: userId,
               targetPrice: data.TargetPrice,
               priority: data.Priority,
               tradingType: data.investmentType,
               stockName: stockName,
+              targetType: data.TargetType,
             },
           }).then((e) =>
             showToast("Successfully added new stock information in database")
@@ -94,13 +102,13 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
         stocksOperations({
           operationType: "Edit",
           recordDetails: {
-            userID: 1,
+            userID: userId,
             recordID: selStock.id,
             targetPrice: data.TargetPrice,
             priority: data.Priority,
             tradingType: data.investmentType,
             stockName: data.name,
-              targetType: data.TargetType,
+            targetType: data.TargetType,
           },
         })
           .then((e) => {
@@ -227,7 +235,7 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
             <Option value="Low">Low</Option>
           </Select>
         </Form.Item>
-        
+
         <Form.Item
           name="TargetType"
           label="Target Type"
@@ -247,6 +255,8 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
           <Select style={{ width: 120 }}>
             <Option value="Positional">Positional</Option>
             <Option value="Intraday">Intraday</Option>
+            <Option value="Investment">Investment</Option>
+            <Option value="Swing">Swing</Option>
           </Select>
         </Form.Item>
 

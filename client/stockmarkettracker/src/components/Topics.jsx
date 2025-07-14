@@ -13,7 +13,7 @@ import parse from "html-react-parser";
 
 const QuillEditor = () => {
   const [form] = Form.useForm();
-  const { isLoggedIn } = useContext(Exchanges);
+  const { isLoggedIn,userId } = useContext(Exchanges);
   const [content, setContent] = useState("");
   const [topicsData, setTopicsData] = useState([]);
   const [toggle, setToggle] = useState("");
@@ -21,6 +21,7 @@ const QuillEditor = () => {
     title: "",
     content: "",
   });
+  
 
   const quillRef = useRef(null);
   const { Title } = Typography;
@@ -47,7 +48,7 @@ const QuillEditor = () => {
     const body = {
       htmlcontent: html,
       title: e.title,
-      userID: 1,
+      userID: userId,
     };
     if (html != "<p><br></p>") {
       fetch(
@@ -163,6 +164,7 @@ const QuillEditor = () => {
                             onClick={() => {
                               setToggle("delete");
                             }}
+                            tabIndex={each.id}
                           />,
                         ]}
                       >

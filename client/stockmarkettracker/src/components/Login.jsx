@@ -10,7 +10,7 @@ const { Title, Text, Link } = Typography;
 
 const LoginModal = ({ visible, onCancel }) => {
   const [form] = Form.useForm();
-  const { setIsLoggedIn } = useContext(Exchanges);
+  const { setIsLoggedIn, setUserId } = useContext(Exchanges);
   const [signUpModelToggle, setSignUpModelToggle] = useState(false);
   const [loginInModelToggle, setLoginInModelToggle] = useState(true);
   const Navigate = useNavigate();
@@ -45,7 +45,7 @@ const LoginModal = ({ visible, onCancel }) => {
           ";expires=" +
           now.toUTCString() +
           ";path=/";
-
+        setUserId(res.userId[0]["UserID"]);
         showToast("Successfully signed In");
         setIsLoggedIn(true);
         setLoginInModelToggle(false);

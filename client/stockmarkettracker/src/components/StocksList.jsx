@@ -9,12 +9,12 @@ import {
   SearchOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
-import { stocksOperations, Exchanges } from "./commonUtils";
+import { stocksOperations, Exchanges, Loader } from "./commonUtils";
 import { AddStockModal, DeleteStockModal } from "./StockModels";
 import { ToastContainer } from "react-toastify";
 
 function StocksList() {
-  const { exchangeData, isLoggedIn } = useContext(Exchanges);
+  const { exchangeData, isLoggedIn, userId } = useContext(Exchanges);
   const [stocksTableObj, setStocksTableObj] = useState({
     "All Stocks": [],
     "Buy Targets": [],
@@ -26,9 +26,10 @@ function StocksList() {
     delete: false,
     edit: false,
   });
+  const [loader, setLoader] = useState(false);
+  const [tradingType,setTradingType] = useState("Positional");
   const selStock = useRef({});
   const prevData = useRef({});
-  const [tradeType, setTradeType] = useState("Positional");
 
   const stocksTableDefinition = [
     {
@@ -174,11 +175,15 @@ function StocksList() {
         "Sell Targets": filterTradingType.filter((e) => e.TargetType == "Sell"),
       });
       prevData.current = dataArr;
+      setLoader(false);
     });
   };
 
   useMemo(() => {
-    if (exchangeData && exchangeData.length) getStocksInfo();
+    if (exchangeData && exchangeData.length) {
+      setLoader(true);
+      getStocksInfo();
+    }
   }, [exchangeData]);
 
   const toogleModal = (name, toggle) => {
@@ -191,10 +196,11 @@ function StocksList() {
 
   const searchStocks = (evt) => {
     setStocksTableObj((oldObj) => {
+
       const filterData = prevData.current.filter((e) => {
         return e.StockName.toLowerCase().includes(
           evt.target.value.toLowerCase()
-        );
+        ) && e.tradingType == tradingType;
       });
       return {
         "All Stocks": filterData,
@@ -231,6 +237,7 @@ function StocksList() {
               <Button
                 style={{ background: "rgb(65 101 210)" }}
                 onClick={() => {
+                  setLoader(true);
                   getStocksInfo();
                 }}
               >
@@ -252,7 +259,7 @@ function StocksList() {
                   const filterTradingType = prevData.current.filter(
                     (e) => e.tradingType == type
                   );
-
+                  setTradingType(type)
                   setStocksTableObj({
                     "All Stocks": filterTradingType,
                     "Buy Targets": filterTradingType.filter(
@@ -267,111 +274,122 @@ function StocksList() {
                   { value: "Positional", label: "Positional Trading" },
                   { value: "Swing", label: "Swing Trading" },
                   { value: "Investment", label: "Investment" },
+                  { value: "Intraday", label: "Intraday" },
                 ]}
               />
             </div>
           </div>
 
-          <div style={{ height: "80%", overflow: "auto" }}>
-            <table class="table table-bordered table-hover bg-white" border={0}>
-              <thead class="table-light">
-                <tr className="text-center">
+          {loader ? (
+            <Loader />
+          ) : (
+            <div style={{ height: "80%", overflow: "auto" }}>
+              <table
+                class="table table-bordered table-hover bg-white"
+                border={0}
+              >
+                <thead class="table-light">
+                  <tr className="text-center">
+                    {stocksTableObj[activeTab].length
+                      ? stocksTableDefinition.map((e) => (
+                          <>
+                            <th style={{ width: e.width }}>{e.Label}</th>
+                          </>
+                        ))
+                      : ""}
+                  </tr>
+                </thead>
+                <tbody>
                   {stocksTableObj[activeTab].length
-                    ? stocksTableDefinition.map((e) => (
-                        <>
-                          <th style={{ width: e.width }}>{e.Label}</th>
-                        </>
-                      ))
-                    : ""}
-                </tr>
-              </thead>
-              <tbody>
-                {stocksTableObj[activeTab].length
-                  ? stocksTableObj[activeTab].map((eachStock) => (
-                      <tr>
-                        {stocksTableDefinition.map((e) =>
-                          e.format ? (
-                            e.format == "edit" ? (
-                              <>
-                                <td
-                                  className="text-center"
-                                  type="primary"
-                                  onClick={() => {
-                                    selStock.current = eachStock;
-                                    toogleModal("edit", true);
-                                  }}
-                                >
-                                  <EditOutlined />
-                                </td>
-                              </>
+                    ? stocksTableObj[activeTab].map((eachStock) => (
+                        <tr>
+                          {stocksTableDefinition.map((e) =>
+                            e.format ? (
+                              e.format == "edit" ? (
+                                <>
+                                  <td
+                                    className="text-center"
+                                    type="primary"
+                                    onClick={() => {
+                                      selStock.current = eachStock;
+                                      toogleModal("edit", true);
+                                    }}
+                                  >
+                                    <EditOutlined />
+                                  </td>
+                                </>
+                              ) : (
+                                <>
+                                  <td
+                                    className="text-center"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => {
+                                      selStock.current = eachStock;
+                                      toogleModal("delete", true);
+                                    }}
+                                  >
+                                    <DeleteOutlined />
+                                  </td>
+                                </>
+                              )
                             ) : (
                               <>
-                                <td
-                                  className="text-center"
-                                  style={{ cursor: "pointer" }}
-                                  onClick={() => {
-                                    selStock.current = eachStock;
-                                    toogleModal("delete", true);
-                                  }}
-                                >
-                                  <DeleteOutlined />
+                                <td className="text-center">
+                                  {eachStock[e.field]}
                                 </td>
                               </>
                             )
-                          ) : (
-                            <>
-                              <td className="text-center">
-                                {eachStock[e.field]}
-                              </td>
-                            </>
-                          )
-                        )}
-                      </tr>
-                    ))
-                  : ""}
-              </tbody>
-            </table>
+                          )}
+                        </tr>
+                      ))
+                    : ""}
+                </tbody>
+              </table>
 
-            <ToastContainer />
-            {Toggle.add && (
-              <AddStockModal
-                allStocksData={stocksTableObj["All Stocks"]}
-                visible={Toggle.add}
-                onClose={() => {
-                  toogleModal("add", false);
-                  setTimeout(() => {
-                    getStocksInfo();
-                  }, 1000);
-                }}
-                type="Add"
-              />
-            )}
-            {Toggle.edit && (
-              <AddStockModal
-                visible={Toggle.edit}
-                selStock={selStock.current}
-                onClose={() => {
-                  toogleModal("edit", false);
-                  setTimeout(() => {
-                    getStocksInfo();
-                  }, 1000);
-                }}
-                type="Edit"
-              />
-            )}
-            {Toggle.delete && (
-              <DeleteStockModal
-                selStock={selStock.current}
-                visible={Toggle.delete}
-                onClose={() => {
-                  toogleModal("delete", false);
-                  setTimeout(() => {
-                    getStocksInfo();
-                  }, 1000);
-                }}
-              />
-            )}
-          </div>
+              <ToastContainer />
+              {Toggle.add && (
+                <AddStockModal
+                  allStocksData={stocksTableObj["All Stocks"]}
+                  visible={Toggle.add}
+                  onClose={() => {
+                    toogleModal("add", false);
+                    // setLoader(true);
+                    setTimeout(() => {
+                      getStocksInfo();
+                    }, 1000);
+                  }}
+                  type="Add"
+                />
+              )}
+              {Toggle.edit && (
+                <AddStockModal
+                  visible={Toggle.edit}
+                  selStock={selStock.current}
+                  onClose={() => {
+                    toogleModal("edit", false);
+                    // setLoader(true);
+                    setTimeout(() => {
+                      getStocksInfo();
+                    }, 1000);
+                  }}
+                  type="Edit"
+                />
+              )}
+              {Toggle.delete && (
+                <DeleteStockModal
+                  selStock={selStock.current}
+                  visible={Toggle.delete}
+                  onClose={() => {
+                    toogleModal("delete", false);
+                    // setLoader(true);
+                    setTimeout(() => {
+                      getStocksInfo();
+                    }, 1000);
+                  }}
+                />
+              )}
+            </div>
+          )}
         </>
       ) : (
         <div
