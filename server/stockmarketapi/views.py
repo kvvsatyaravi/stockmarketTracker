@@ -20,7 +20,7 @@ def allStocksData(request):
 
 @api_view(['POST'])
 def validateLoginDetails(request):
-    validate = User.objects.get(username=request.data["username"],password=request.data["password"])
+    validate = User.objects.filter(username=request.data["username"],password=request.data["password"]).exists()
     if validate:
         userId = User.objects.filter(username=request.data["username"]).values('UserID')
         return Response({
@@ -28,7 +28,8 @@ def validateLoginDetails(request):
             "userId":userId
         })
     else:
-        Http404("user Not Exist")
+        return Response({"response": False})
+        
 
 @api_view(['POST'])
 def addUserAccount(request):

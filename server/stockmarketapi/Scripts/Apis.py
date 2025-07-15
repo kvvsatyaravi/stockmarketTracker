@@ -160,7 +160,7 @@ class Api:
 
             case "Retrive":
                 allDataDic = {}
-                usersData = StockInfo.objects.all()
-                allDataDic['data'] = [{'id':u.id,'targetPrice': u.TargetPrice, 'Priority': u.Priority,'tradingType':u.tradingType,'TargetType':u.TargetType,'StockName':u.StockName,'EditDate':u.EditDate} for u in usersData]
+                usersData = StockInfo.objects.filter(user=formData["userID"]).values()
+                allDataDic['data'] = [{'id':u['id'],'targetPrice': u['TargetPrice'], 'Priority': u['Priority'],'tradingType':u['tradingType'],'TargetType':u['TargetType'],'StockName':u['StockName'],'EditDate':u['EditDate']} for u in usersData]
                 return allDataDic
 
