@@ -27,7 +27,7 @@ function StocksList() {
     edit: false,
   });
   const [loader, setLoader] = useState(false);
-  const [tradingType,setTradingType] = useState("Positional");
+  const [tradingType, setTradingType] = useState("Positional");
   const selStock = useRef({});
   const prevData = useRef({});
 
@@ -82,7 +82,9 @@ function StocksList() {
   const getStocksInfo = () => {
     stocksOperations({
       operationType: "Retrive",
-      recordDetails: "",
+      recordDetails: {
+        userID: userId,
+      },
     }).then(async (result) => {
       console.log(result);
       var dataArr = [];
@@ -196,11 +198,11 @@ function StocksList() {
 
   const searchStocks = (evt) => {
     setStocksTableObj((oldObj) => {
-
       const filterData = prevData.current.filter((e) => {
-        return e.StockName.toLowerCase().includes(
-          evt.target.value.toLowerCase()
-        ) && e.tradingType == tradingType;
+        return (
+          e.StockName.toLowerCase().includes(evt.target.value.toLowerCase()) &&
+          e.tradingType == tradingType
+        );
       });
       return {
         "All Stocks": filterData,
@@ -259,7 +261,7 @@ function StocksList() {
                   const filterTradingType = prevData.current.filter(
                     (e) => e.tradingType == type
                   );
-                  setTradingType(type)
+                  setTradingType(type);
                   setStocksTableObj({
                     "All Stocks": filterTradingType,
                     "Buy Targets": filterTradingType.filter(
@@ -284,7 +286,7 @@ function StocksList() {
             <Loader />
           ) : (
             <div style={{ height: "80%", overflow: "auto" }}>
-              <table
+             {stocksTableObj[activeTab].length ? <table
                 class="table table-bordered table-hover bg-white"
                 border={0}
               >
@@ -344,7 +346,7 @@ function StocksList() {
                       ))
                     : ""}
                 </tbody>
-              </table>
+              </table>: <div className="noDataFound">No Data Found</div>}
 
               <ToastContainer />
               {Toggle.add && (

@@ -64,6 +64,7 @@ const LoginModal = ({ visible, onCancel }) => {
 
   return (
     <>
+      <ToastContainer />
       <Modal
         visible={!signUpModelToggle && loginInModelToggle}
         onCancel={() => {
@@ -77,7 +78,6 @@ const LoginModal = ({ visible, onCancel }) => {
         centered
         width={400}
       >
-        <ToastContainer />
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <Title level={2} style={{ margin: 0 }}>
             Login

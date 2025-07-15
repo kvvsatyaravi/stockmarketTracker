@@ -48,3 +48,12 @@ body {
 .custom-card-container .ant-card-body {
   min-height: 170px;
 }
+
+.noDataFound {
+  text-align: center;
+  height: 100%;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
