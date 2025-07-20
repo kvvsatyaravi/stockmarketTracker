@@ -68,3 +68,9 @@
   border: 1px solid black;
   padding: 0px 4px;
 }
+
+.secondary-color-option .ant-select-selector {
+  background-color: #ff914c !important;
+  border: #ff914c !important;
+  color: white;
+}

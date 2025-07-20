@@ -94,7 +94,7 @@ const AddStockModal = ({ visible, onClose, type, selStock, allStocksData }) => {
           );
         } else {
           showToast(
-            "Successfully added new stock information in database",
+            "Stock already existed",
             "error"
           );
         }

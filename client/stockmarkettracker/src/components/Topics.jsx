@@ -7,13 +7,14 @@ import {
   EditOutlined,
   DeleteFilled,
 } from "@ant-design/icons";
-import { Exchanges,getCookieValue } from "./commonUtils";
+import { Exchanges, getCookieValue } from "./commonUtils";
 import { showToast } from "./commonUtils";
+import { ToastContainer } from "react-toastify";
 import parse from "html-react-parser";
 
 const QuillEditor = () => {
   const [form] = Form.useForm();
-  const { isLoggedIn,userId } = useContext(Exchanges);
+  const { isLoggedIn, userId } = useContext(Exchanges);
   const [content, setContent] = useState("");
   const [topicsData, setTopicsData] = useState([]);
   const [toggle, setToggle] = useState("");
@@ -21,14 +22,23 @@ const QuillEditor = () => {
     title: "",
     content: "",
   });
-  
+  const selRecord = useRef(null);
 
   const quillRef = useRef(null);
   const { Title } = Typography;
 
   const getAllTopics = () => {
     fetch(
-      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getTopics/"
+      "https://www.stockmarkettracker.ksrk3.in/stockmarketTrackerApi/getTopics/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userID: userId,
+        }),
+      }
     )
       .then((e) => e.json())
       .then((e) => {
@@ -71,10 +81,15 @@ const QuillEditor = () => {
           console.log("Success:", responseData);
           getAllTopics();
           showToast("Successfully added in topics database");
-        setToggle("");
+          setToggle("");
+          setContent("");
+         form.resetFields();
         })
         .catch((error) => {
           console.error("Error:", error);
+          setToggle("");
+          setContent("");
+          form.resetFields();
           showToast("Some error there in serverside", "error");
         });
     } else {
@@ -84,6 +99,7 @@ const QuillEditor = () => {
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
+      <ToastContainer />
       {isLoggedIn ? (
         <>
           <Modal
@@ -141,46 +157,48 @@ const QuillEditor = () => {
               height: "75vh",
               overflow: "auto",
             }}
-
             className="custom-card-container"
           >
-            {topicsData.length
-              ? topicsData.map((each) => {
-                  return (
-                    <>
-                      <Card
-                        style={{
-                          width: "245px",
-                          height: "230px",
-                          cursor: "pointer",
-                        }}
-                        actions={[
-                          <EditOutlined
-                            style={{ color: "blue" }}
-                            onClick={() => alert("Functionality Not Completed")}
-                          />,
-                          <DeleteFilled
-                            style={{ color: "red" }}
-                            onClick={() => {
-                              setToggle("delete");
-                            }}
-                            tabIndex={each.id}
-                          />,
-                        ]}
-                      >
-                        <Card.Meta
+            {topicsData.length ? (
+              topicsData.map((each) => {
+                return (
+                  <>
+                    <Card
+                      style={{
+                        width: "245px",
+                        height: "230px",
+                        cursor: "pointer",
+                      }}
+                      actions={[
+                        <EditOutlined
+                          style={{ color: "blue" }}
+                          onClick={() => alert("Functionality Not Completed")}
+                        />,
+                        <DeleteFilled
+                          style={{ color: "red" }}
                           onClick={() => {
-                            setToggle("viewCard");
-                            setSelCard(each);
+                            selRecord.current = each.id;
+                            setToggle("delete");
                           }}
-                          title={each.title}
-                          description={parse(each.content)}
-                        />
-                      </Card>
-                    </>
-                  );
-                })
-              : "No Data Found"}
+                          tabIndex={each.id}
+                        />,
+                      ]}
+                    >
+                      <Card.Meta
+                        onClick={() => {
+                          setToggle("viewCard");
+                          setSelCard(each);
+                        }}
+                        title={each.title}
+                        description={parse(each.content)}
+                      />
+                    </Card>
+                  </>
+                );
+              })
+            ) : (
+              <div className="noDataFound">No Data Found</div>
+            )}
           </div>
         </>
       ) : (
@@ -219,7 +237,7 @@ const QuillEditor = () => {
               style={{ background: "#091A52" }}
               onClick={(e) => {
                 var body = {
-                  id: 1,
+                  id: selRecord.current,
                 };
 
                 fetch(

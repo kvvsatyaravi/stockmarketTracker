@@ -61,6 +61,7 @@ function StocksList() {
       field: "Priority",
       Label: "Priority",
       width: "10%",
+      colorMapping: true,
     },
     {
       Label: "Change Difference",
@@ -79,6 +80,12 @@ function StocksList() {
     },
   ];
 
+  const colorsMapping = {
+    Medium: "#b6b624",
+    High: "red",
+    Low: "green",
+  };
+
   const getStocksInfo = () => {
     stocksOperations({
       operationType: "Retrive",
@@ -86,7 +93,6 @@ function StocksList() {
         userID: userId,
       },
     }).then(async (result) => {
-      console.log(result);
       var dataArr = [];
       var exchangesData = exchangeData;
       for (let i = 0; i < result.data.length; i++) {
@@ -256,7 +262,8 @@ function StocksList() {
               />
               <Select
                 defaultValue="Positional"
-                style={{ width: 120 }}
+                style={{ width: 150 }}
+                className="secondary-color-option"
                 onChange={(type) => {
                   const filterTradingType = prevData.current.filter(
                     (e) => e.tradingType == type
@@ -276,7 +283,7 @@ function StocksList() {
                   { value: "Positional", label: "Positional Trading" },
                   { value: "Swing", label: "Swing Trading" },
                   { value: "Investment", label: "Investment" },
-                  { value: "Intraday", label: "Intraday" },
+                  { value: "Intraday", label: "Intraday Trading" },
                 ]}
               />
             </div>
@@ -286,67 +293,83 @@ function StocksList() {
             <Loader />
           ) : (
             <div style={{ height: "80%", overflow: "auto" }}>
-             {stocksTableObj[activeTab].length ? <table
-                class="table table-bordered table-hover bg-white"
-                border={0}
-              >
-                <thead class="table-light">
-                  <tr className="text-center">
+              {stocksTableObj[activeTab].length ? (
+                <table
+                  class="table table-bordered table-hover bg-white"
+                  border={0}
+                >
+                  <thead class="table-light">
+                    <tr className="text-center">
+                      {stocksTableObj[activeTab].length
+                        ? stocksTableDefinition.map((e) => (
+                            <>
+                              <th style={{ width: e.width }}>{e.Label}</th>
+                            </>
+                          ))
+                        : ""}
+                    </tr>
+                  </thead>
+                  <tbody>
                     {stocksTableObj[activeTab].length
-                      ? stocksTableDefinition.map((e) => (
-                          <>
-                            <th style={{ width: e.width }}>{e.Label}</th>
-                          </>
-                        ))
-                      : ""}
-                  </tr>
-                </thead>
-                <tbody>
-                  {stocksTableObj[activeTab].length
-                    ? stocksTableObj[activeTab].map((eachStock) => (
-                        <tr>
-                          {stocksTableDefinition.map((e) =>
-                            e.format ? (
-                              e.format == "edit" ? (
-                                <>
-                                  <td
-                                    className="text-center"
-                                    type="primary"
-                                    onClick={() => {
-                                      selStock.current = eachStock;
-                                      toogleModal("edit", true);
-                                    }}
-                                  >
-                                    <EditOutlined />
-                                  </td>
-                                </>
+                      ? stocksTableObj[activeTab].map((eachStock) => (
+                          <tr>
+                            {stocksTableDefinition.map((e) =>
+                              e.format ? (
+                                e.format == "edit" ? (
+                                  <>
+                                    <td
+                                      className="text-center"
+                                      type="primary"
+                                      onClick={() => {
+                                        selStock.current = eachStock;
+                                        toogleModal("edit", true);
+                                      }}
+                                    >
+                                      <EditOutlined />
+                                    </td>
+                                  </>
+                                ) : (
+                                  <>
+                                    <td
+                                      className="text-center"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() => {
+                                        selStock.current = eachStock;
+                                        toogleModal("delete", true);
+                                      }}
+                                    >
+                                      <DeleteOutlined />
+                                    </td>
+                                  </>
+                                )
                               ) : (
                                 <>
                                   <td
                                     className="text-center"
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() => {
-                                      selStock.current = eachStock;
-                                      toogleModal("delete", true);
-                                    }}
+                                    style={
+                                      e["colorMapping"]
+                                        ? {
+                                            color:
+                                              colorsMapping[
+                                                eachStock[e.field]
+                                              ],
+                                          }
+                                        : {}
+                                    }
                                   >
-                                    <DeleteOutlined />
+                                    {eachStock[e.field]}
                                   </td>
                                 </>
                               )
-                            ) : (
-                              <>
-                                <td className="text-center">
-                                  {eachStock[e.field]}
-                                </td>
-                              </>
-                            )
-                          )}
-                        </tr>
-                      ))
-                    : ""}
-                </tbody>
-              </table>: <div className="noDataFound">No Data Found</div>}
+                            )}
+                          </tr>
+                        ))
+                      : ""}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="noDataFound">No Data Found</div>
+              )}
 
               <ToastContainer />
               {Toggle.add && (
