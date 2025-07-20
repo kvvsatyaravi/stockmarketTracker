@@ -15,7 +15,7 @@ import "./layout.css";
 
 function Layout() {
   const [exchangeData, setExchangeData] = useState({});
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [logoutUI, SetLogoutUI] = useState(false);
   const [userId, setUserId] = useState(null);
   const Navigate = useNavigate();
@@ -57,7 +57,7 @@ function Layout() {
           isLoggedIn,
           setIsLoggedIn,
           userId,
-          setUserId
+          setUserId,
         }}
       >
         <div class="container-fluid">
@@ -91,7 +91,7 @@ function Layout() {
                         Navigate("/");
                       }}
                     >
-                      Logout
+                      {isLoggedIn ? "Logout" : "Login"}
                     </div>
                   )}
                 </div>

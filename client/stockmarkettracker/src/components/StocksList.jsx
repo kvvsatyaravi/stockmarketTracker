@@ -194,6 +194,10 @@ function StocksList() {
     }
   }, [exchangeData]);
 
+  useEffect(()=>{
+console.log(isLoggedIn)
+  },[isLoggedIn])
+
   const toogleModal = (name, toggle) => {
     setToggle((prev) => {
       var initialValues = { add: false, delete: false, edit: false };

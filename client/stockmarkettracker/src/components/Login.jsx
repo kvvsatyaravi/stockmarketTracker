@@ -52,11 +52,13 @@ const LoginModal = ({ visible, onCancel }) => {
         Navigate("/StocksList");
       } else {
         showToast("Invalid credentials", "error");
+        Navigate("/StocksList");
         setIsLoggedIn(false);
         setLoginInModelToggle(false);
       }
     } catch (err) {
       showToast("Invalid credentials", "error");
+      Navigate("/StocksList");
       setIsLoggedIn(false);
       setLoginInModelToggle(false);
     }
@@ -70,9 +72,11 @@ const LoginModal = ({ visible, onCancel }) => {
         onCancel={() => {
           setLoginInModelToggle(false);
           setIsLoggedIn(false);
+          Navigate("/StocksList");
         }}
         afterClose={() => {
           setIsLoggedIn(false);
+          Navigate("/StocksList");
         }}
         footer={null}
         centered
