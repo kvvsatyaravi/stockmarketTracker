@@ -174,7 +174,7 @@ function StocksList() {
         }
       }
       const filterTradingType = dataArr.filter(
-        (e) => e.tradingType == "Positional"
+        (e) => e.tradingType == tradingType
       );
 
       setStocksTableObj({

@@ -181,11 +181,11 @@ def deleteTopics(request):
         'response':True
     })
     
-@api_view(['GET'])
+@api_view(['POST'])
 def getTopics(request):
     allDataDic = {}
-    usersData = Topics.objects.all()
-    allDataDic['data'] = [{'id':u.id,'title': u.title, 'content': u.content} for u in usersData]
+    usersData = Topics.objects.filter(user=request.data["userID"]).values()
+    allDataDic['data'] = [{'id':u['id'],'title': u['title'], 'content': u['content']} for u in usersData]
     
     return Response({
         'response':True,
